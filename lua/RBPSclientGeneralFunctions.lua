@@ -5,7 +5,7 @@
 //    Created by:   Synomi and Zups and UWE
 //
 // ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
-        
+       
 function RBPS:sendServerInfo()
      
     local address, password = ""
@@ -62,3 +62,4 @@ function RBPS:getPlayerColor(count, default)
     return default
     end
 end
+

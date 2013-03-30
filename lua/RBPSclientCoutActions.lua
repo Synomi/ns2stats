@@ -28,10 +28,9 @@ if Cout.createClientNetworkAction then
             
                       local values = {   
            }   
-           values.lastRoundLink = RBPSlastRound
-           local clientFile = io.open("config://" .. "ns2stats_client_data.json", "w+")   
-           clientFile:write(json.encode(values, { indent = true }))
-           io.close(clientFile)
+           
+           RBPSclientConfig.lastRoundLink = RBPSlastRound
+           RBPS:saveClientConfig()
         end
     )
     

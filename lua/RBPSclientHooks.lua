@@ -163,8 +163,12 @@ end
             
 function RBPSopenLastRound(scaleX,scaleY)
 
-   openNS2Stats(RBPSlastRound, scaleX,scaleY)
-  // Client.ShowWebpage(RBPSlastRound)
+    if RBPSclientConfig.browser and RBPSclientConfig.browser == "steam" then
+        Client.ShowWebpage(RBPSlastRound)
+    else
+        openNS2Stats(RBPSlastRound, scaleX,scaleY)
+    end
+    
 end
 
 Event.Hook("Console_check",RBPSopenLastRound)

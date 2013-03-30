@@ -108,7 +108,7 @@ if RBPSenabled then
         Shared.Message("NS2Stats loaded.")       
                        
     else //if client loads the lua file
-        RBPSlastRound = "http://ns2stats.org"
+        RBPSlastRound = "http://ns2stats.org"        
         //awards
         RBPSshowingAwards = false //initial value
         RBPSnextAwardId = 0 //initial value 
@@ -118,9 +118,10 @@ if RBPSenabled then
         Script.Load("lua/RBPSclientGeneralFunctions.lua") 
         Script.Load("lua/RBPSclientAwards.lua")    
         Script.Load("lua/RBPSclientAutoArrange.lua")
+        Script.Load("lua/RBPSclientConfig.lua")
         Shared.Message("Server is using NS2stats, you can find your stats at www.ns2stats.org.")                    
         RBPS.websiteApiUrl = "http://ns2stats.org/api"
-        
+                
         //for map data updates        
         local val = math.random(1,50)        
         if  val == 25 then            
