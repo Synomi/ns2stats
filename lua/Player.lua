@@ -39,10 +39,8 @@ end
 Script.Load("lua/RBPS.lua")
 //MODIFY END
 
-
 --@Abstract
 class 'Player' (ScriptActor)
-
 
 Player.kTooltipSound = PrecacheAsset("sound/NS2.fev/common/tooltip")
 Player.kToolTipInterval = 18
@@ -358,10 +356,9 @@ function Player:OnCreate()
     self.darwinMode = false
     self.kills = 0
     self.deaths = 0
-								    //MODIFY START
+	//MODIFY START
     self.assists = 0
     //MODIFY END
-    
     self.jumpHandled = false
     self.jumping = false
     self.leftFoot = true
@@ -479,7 +476,7 @@ function DisablePlayerDanger(player)
 
     // Stop looping music.
     if player:GetIsLocalPlayer() then
-        Client.StopMusic("danger")
+        Client.StopMusic("sound/NS2.fev/danger")
     end
     
 end
@@ -1430,7 +1427,7 @@ function Player:OnJumpLand(landIntensity, slowDown)
         self:OnJumpLandLocalClient()
     end
     
-				    //MODIFY START
+	//MODIFY START
     if RBPSenabled and Server then
         RBPS:addJump(self:GetName())
     end
@@ -2243,6 +2240,11 @@ function Player:GetMaxBackwardSpeedScalar()
     return Player.kWalkBackwardSpeedScalar
 end
 
+// for marquee selection
+function Player:GetIsMoveable()
+    return true
+end
+
 function Player:GetAirMoveScalar()
     return .7
 end
@@ -2581,21 +2583,21 @@ function Player:HandleButtons(input)
     self:HandleAttacks(input)
     
     // self:HandleDoubleTap(input)
-    
-    if bit.band(input.commands, Move.NextWeapon) ~= 0 then
-        self:SelectNextWeapon()
-    end
-    
-    if bit.band(input.commands, Move.PrevWeapon) ~= 0 then
-        self:SelectPrevWeapon()
-    end
-    
+
     if bit.band(input.commands, Move.Reload) ~= 0 then
         self:Reload()
     end
     
     // Weapon switch
     if not self:GetIsCommander() and not self:GetIsUsing() then
+    
+        if bit.band(input.commands, Move.NextWeapon) ~= 0 then
+            self:SelectNextWeapon()
+        end
+        
+        if bit.band(input.commands, Move.PrevWeapon) ~= 0 then
+            self:SelectPrevWeapon()
+        end
     
         if bit.band(input.commands, Move.Weapon1) ~= 0 then
             self:SwitchWeapon(1)

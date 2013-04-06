@@ -348,7 +348,7 @@ local kScoresMessage =
     score = string.format("integer (0 to %d)", kMaxScore),
     kills = string.format("integer (0 to %d)", kMaxKills),
     deaths = string.format("integer (0 to %d)", kMaxDeaths),
-					    //MODIFY START
+							    //MODIFY START
     assists = string.format("integer (0 to %d)", kMaxScore),
     badge = "enum kBadges",
     //MODIFY END
@@ -373,12 +373,12 @@ function BuildScoresMessage(scorePlayer, sendToPlayer)
     if HasMixin(scorePlayer, "Scoring") then
         t.score = scorePlayer:GetScore()
     end
-						    //MODIFY START    
+    t.kills = scorePlayer:GetKills()
+    t.deaths = scorePlayer:GetDeaths()
+	//MODIFY START    
     t.assists = scorePlayer:GetAssists()    
     t.badge = scorePlayer.currentBadge or kBadges.None
     //MODIFY END
-    t.kills = scorePlayer:GetKills()
-    t.deaths = scorePlayer:GetDeaths()
     t.resources = ConditionalValue(isEnemy, 0, math.floor(scorePlayer:GetResources()))
     t.isCommander = ConditionalValue(isEnemy, false, scorePlayer:isa("Commander"))
     t.isRookie = ConditionalValue(isEnemy, false, scorePlayer:GetIsRookie())
@@ -543,18 +543,19 @@ end
 
 local kCommTargetedAction = 
 {
-    techId              = "enum kTechId",
+    techId = "enum kTechId",
     
     // normalized pick coords for CommTargetedAction
     // or world coords for kCommTargetedAction
-    x                   = "float",
-    y                   = "float",
-    z                   = "float",
+    x = "float",
+    y = "float",
+    z = "float",
     
-    orientationRadians  = "angle (11 bits)"
+    orientationRadians  = "angle (11 bits)",
+    targetId = "entityid"
 }
 
-function BuildCommTargetedActionMessage(techId, x, y, z, orientationRadians)
+function BuildCommTargetedActionMessage(techId, x, y, z, orientationRadians, targetId)
 
     local t = {}
     
@@ -563,13 +564,14 @@ function BuildCommTargetedActionMessage(techId, x, y, z, orientationRadians)
     t.y = y
     t.z = z
     t.orientationRadians = orientationRadians
+    t.targetId = targetId
     
     return t
     
 end
 
 function ParseCommTargetedActionMessage(t)
-    return t.techId, Vector(t.x, t.y, t.z), t.orientationRadians
+    return t.techId, Vector(t.x, t.y, t.z), t.orientationRadians, t.targetId
 end
 
 local kGorgeBuildStructureMessage = 

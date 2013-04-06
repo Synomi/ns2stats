@@ -268,6 +268,13 @@ function RBPS:tournamentModeLogic()
                           
         RBPS.startGame = true
         
+        //reset scores
+        for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do            
+            if player.ResetScores then
+                player:ResetScores()
+            end            
+        end
+
         NS2GR:ResetGame()        
         NS2GR:SetGameState(kGameState.Countdown)        
         NS2GR.countdownTime = kCountDownLength        

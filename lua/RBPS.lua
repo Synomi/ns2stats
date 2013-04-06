@@ -11,7 +11,7 @@ Script.Load("lua/RBPSentity.lua")
 class 'RBPS' (RoundBasedPlayerStats)
 Script.Load("lua/RBPSplugins.lua")
 
-RBPSforBuild = 243
+RBPSforBuild = 244
 RBPSenabled = nil
 
 
@@ -30,7 +30,8 @@ end
 if RBPSenabled then
     
     //loaded only for server   
-    RBPSdebug=false //shows debug information if true       
+    RBPSdebug=false //shows debug information if true 
+      
     if Server then
         
         Script.Load("lua/RBPSconfig.lua")        
@@ -52,10 +53,7 @@ if RBPSenabled then
         Script.Load("lua/RBPSserverAwards.lua")    
         Script.Load("lua/RBPSserverAwardHelpers.lua")    
         Script.Load("lua/RBPSserverWebdata.lua")    
-        Script.Load("lua/RBPSserverAutoArrange.lua")
-                
-           
-        
+        Script.Load("lua/RBPSserverAutoArrange.lua")                                   
 
         RBPSserverInfo = {} //for server ip+port+password        
         RBPS.gamestarted = 0 //initial value

@@ -19,7 +19,12 @@ GUIScoreboard.kClickForMouseTextSize = GUIScale(22)
 GUIScoreboard.kClickForMouseText = Locale.ResolveString("SB_CLICK_FOR_MOUSE")
 
 // Shared constants.
-GUIScoreboard.kFontName = "Calibri"
+GUIScoreboard.kTeamInfoFontName      = "fonts/AgencyFB_tiny.fnt"
+GUIScoreboard.kPlayerStatsFontName   = "fonts/AgencyFB_tiny.fnt"
+GUIScoreboard.kTeamNameFontName      = "fonts/AgencyFB_small.fnt"
+GUIScoreboard.kGameTimeFontName      = "fonts/AgencyFB_small.fnt"
+GUIScoreboard.kClickForMouseFontName = "fonts/AgencyFB_small.fnt"
+
 GUIScoreboard.kLowPingThreshold = 100
 GUIScoreboard.kLowPingColor = Color(0, 1, 0, 1)
 GUIScoreboard.kMedPingThreshold = 249
@@ -114,8 +119,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Team name text item.
     local teamNameItem = GUIManager:CreateTextItem()
-    teamNameItem:SetFontName(GUIScoreboard.kFontName)
-    teamNameItem:SetFontSize(GUIScoreboard.kTeamNameFontSize)
+    teamNameItem:SetFontName(GUIScoreboard.kTeamNameFontName)
     teamNameItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     teamNameItem:SetTextAlignmentX(GUIItem.Align_Min)
     teamNameItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -125,8 +129,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Add team info (team resources and number of players).
     local teamInfoItem = GUIManager:CreateTextItem()
-    teamInfoItem:SetFontName(GUIScoreboard.kFontName)
-    teamInfoItem:SetFontSize(GUIScoreboard.kTeamInfoFontSize)
+    teamInfoItem:SetFontName(GUIScoreboard.kTeamInfoFontName)
     teamInfoItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     teamInfoItem:SetTextAlignmentX(GUIItem.Align_Min)
     teamInfoItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -134,8 +137,7 @@ local function CreateTeamBackground(self, teamNumber)
     teamInfoItem:SetColor(color)
     teamItem:AddChild(teamInfoItem)
     
-       
-        //MODIFY START
+          //MODIFY START
     //local currentColumnX = Client.GetScreenWidth() / 6
     local currentColumnX = Client.GetScreenWidth() / 7
     //MODIFY END
@@ -144,8 +146,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Status text item.
     local statusItem = GUIManager:CreateTextItem()
-    statusItem:SetFontName(GUIScoreboard.kFontName)
-    statusItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    statusItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     statusItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     statusItem:SetTextAlignmentX(GUIItem.Align_Min)
     statusItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -158,8 +159,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Score text item.
     local scoreItem = GUIManager:CreateTextItem()
-    scoreItem:SetFontName(GUIScoreboard.kFontName)
-    scoreItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    scoreItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     scoreItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     scoreItem:SetTextAlignmentX(GUIItem.Align_Min)
     scoreItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -172,8 +172,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Kill text item.
     local killsItem = GUIManager:CreateTextItem()
-    killsItem:SetFontName(GUIScoreboard.kFontName)
-    killsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    killsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     killsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     killsItem:SetTextAlignmentX(GUIItem.Align_Min)
     killsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -186,8 +185,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Deaths text item.
     local deathsItem = GUIManager:CreateTextItem()
-    deathsItem:SetFontName(GUIScoreboard.kFontName)
-    deathsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    deathsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     deathsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     deathsItem:SetTextAlignmentX(GUIItem.Align_Min)
     deathsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -197,12 +195,11 @@ local function CreateTeamBackground(self, teamNumber)
     teamItem:AddChild(deathsItem)
     
     currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
-	
-			//MODIFY START
+    
+				//MODIFY START
     //assists
     local assistsItem = GUIManager:CreateTextItem()
-    assistsItem:SetFontName(GUIScoreboard.kFontName)
-    assistsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    assistsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)    
     assistsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     assistsItem:SetTextAlignmentX(GUIItem.Align_Min)
     assistsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -214,11 +211,10 @@ local function CreateTeamBackground(self, teamNumber)
     currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
     
     //MODIFY END
-    
+	
     // Resources text item.
     local resItem = GUIManager:CreateTextItem()
-    resItem:SetFontName(GUIScoreboard.kFontName)
-    resItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    resItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     resItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     resItem:SetTextAlignmentX(GUIItem.Align_Min)
     resItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -231,8 +227,7 @@ local function CreateTeamBackground(self, teamNumber)
     
     // Ping text item.
     local pingItem = GUIManager:CreateTextItem()
-    pingItem:SetFontName(GUIScoreboard.kFontName)
-    pingItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    pingItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     pingItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     pingItem:SetTextAlignmentX(GUIItem.Align_Min)
     pingItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -262,8 +257,7 @@ function GUIScoreboard:Initialize()
     self.gameTimeBackground:SetLayer(kGUILayerScoreboard)
     
     self.gameTime = GUIManager:CreateTextItem()
-    self.gameTime:SetFontName(GUIScoreboard.kFontName)
-    self.gameTime:SetFontSize(GUIScoreboard.kGameTimeTextSize)
+    self.gameTime:SetFontName(GUIScoreboard.kGameTimeFontName)
     self.gameTime:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.gameTime:SetTextAlignmentX(GUIItem.Align_Center)
     self.gameTime:SetTextAlignmentY(GUIItem.Align_Center)
@@ -304,8 +298,7 @@ function GUIScoreboard:Initialize()
     self.clickForMouseBackground:SetIsVisible(false)
     
     self.clickForMouseIndicator = GUIManager:CreateTextItem()
-    self.clickForMouseIndicator:SetFontName(GUIScoreboard.kFontName)
-    self.clickForMouseIndicator:SetFontSize(GUIScoreboard.kClickForMouseTextSize)
+    self.clickForMouseIndicator:SetFontName(GUIScoreboard.kClickForMouseFontName)
     self.clickForMouseIndicator:SetAnchor(GUIItem.Middle, GUIItem.Center)
     self.clickForMouseIndicator:SetTextAlignmentX(GUIItem.Align_Center)
     self.clickForMouseIndicator:SetTextAlignmentY(GUIItem.Align_Center)
@@ -547,11 +540,11 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         local clientIndex = playerRecord.ClientIndex
         local score = playerRecord.Score
         local kills = playerRecord.Kills
-				 //MODIFY START
+        local deaths = playerRecord.Deaths
+					 //MODIFY START
         local assists = playerRecord.Assists
         local badgeTexture = playerRecord.Badge
         //MODIFY END
-        local deaths = playerRecord.Deaths
         local isCommander = playerRecord.IsCommander
         local isRookie = playerRecord.IsRookie
         local resourcesStr = ConditionalValue(isVisibleTeam, tostring(playerRecord.Resources), "-")
@@ -582,6 +575,7 @@ function GUIScoreboard:UpdateTeam(updateTeam)
             end
         end
         
+        player["Index"]:SetText(index..".")
         player["Name"]:SetText(playerName)
         
         // Needed to determine who to (un)mute when voice icon is clicked.
@@ -599,7 +593,7 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         player["Score"]:SetText(tostring(score))
         player["Kills"]:SetText(tostring(kills))
         player["Deaths"]:SetText(tostring(deaths))
-				//MODIFY START
+						//MODIFY START
         player["Assists"]:SetText(tostring(assists))
         if badgeTexture then
             player["Badge"]:SetIsVisible(true)
@@ -617,7 +611,7 @@ function GUIScoreboard:UpdateTeam(updateTeam)
             player["Score"]:SetColor(GUIScoreboard.kCommanderFontColor)
             player["Kills"]:SetColor(GUIScoreboard.kCommanderFontColor)
             player["Deaths"]:SetColor(GUIScoreboard.kCommanderFontColor)
-				 //MODIFY START
+							 //MODIFY START
             player["Assists"]:SetColor(GUIScoreboard.kCommanderFontColor)
             //MODIFY END
             player["Status"]:SetColor(GUIScoreboard.kCommanderFontColor)
@@ -633,13 +627,14 @@ function GUIScoreboard:UpdateTeam(updateTeam)
         elseif playerRecord.IsRookie and isVisibleTeam then
         
             player["Name"]:SetColor(kNewPlayerColorFloat)
+            player["Status"]:SetColor(GUIScoreboard.kWhiteColor)
         
         else
         
             player["Score"]:SetColor(GUIScoreboard.kWhiteColor)
             player["Kills"]:SetColor(GUIScoreboard.kWhiteColor)
             player["Deaths"]:SetColor(GUIScoreboard.kWhiteColor)
-					//MODIFY START
+							//MODIFY START
             player["Assists"]:SetColor(GUIScoreboard.kWhiteColor)
             //MODIFY END
             player["Status"]:SetColor(GUIScoreboard.kWhiteColor)
@@ -700,17 +695,27 @@ function GUIScoreboard:CreatePlayerItem()
     playerItem:SetColor(Color(1, 1, 1, 1))
     playerItem:SetTexture("ui/hud_elements.dds")
     playerItem:SetTextureCoordinates(0, 0, 0.558, 0.16)
+
+    // Player number item
+    local playerIndexItem = GUIManager:CreateTextItem()
+    playerIndexItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
+    playerIndexItem:SetAnchor(GUIItem.Left, GUIItem.Top)
+    playerIndexItem:SetTextAlignmentX(GUIItem.Align_Max)
+    playerIndexItem:SetTextAlignmentY(GUIItem.Align_Min)
+    playerIndexItem:SetPosition(Vector(15, 5, 0))
+    playerIndexItem:SetColor(Color(0.5, 0.5, 0.5, 1))
+    playerItem:AddChild(playerIndexItem)
     
     // Player name text item.
     local playerNameItem = GUIManager:CreateTextItem()
-    playerNameItem:SetFontName(GUIScoreboard.kFontName)
-    playerNameItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    playerNameItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     playerNameItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     playerNameItem:SetTextAlignmentX(GUIItem.Align_Min)
     playerNameItem:SetTextAlignmentY(GUIItem.Align_Min)
-    	 //MODIFY START
+    
+	    	 //MODIFY START
     playerNameItem:SetPosition(Vector(GUIScoreboard.kPlayerVoiceChatIconSize + GUIScoreboard.kBadgeSize + 10, 5, 0))
-    //playerNameItem:SetPosition(Vector(30, 5, 0))
+    //playerNameItem:SetPosition(Vector(35, 5, 0))
     //MODIFY END
     playerNameItem:SetColor(Color(1, 1, 1, 1))
     playerItem:AddChild(playerNameItem)
@@ -719,14 +724,15 @@ function GUIScoreboard:CreatePlayerItem()
     local playerVoiceIcon = GUIManager:CreateGraphicItem()
     playerVoiceIcon:SetSize(Vector(GUIScoreboard.kPlayerVoiceChatIconSize, GUIScoreboard.kPlayerVoiceChatIconSize, 0))
     playerVoiceIcon:SetAnchor(GUIItem.Left, GUIItem.Top)
-    	//MODIFY START
+    //playerVoiceIcon:SetPosition(Vector(-GUIScoreboard.kPlayerVoiceChatIconSize - 0, 0, 0))
+	   	//MODIFY START
     playerVoiceIcon:SetPosition(Vector(-GUIScoreboard.kPlayerVoiceChatIconSize - 10 - GUIScoreboard.kBadgeSize, 0, 0))
-    //playerVoiceIcon:SetPosition(Vector(-GUIScoreboard.kPlayerVoiceChatIconSize - 5, 0, 0))
+    //playerVoiceIcon:SetPosition(Vector(-GUIScoreboard.kPlayerVoiceChatIconSize - 0, 0, 0))
     //MODIFY END
     playerVoiceIcon:SetTexture("ui/speaker.dds")
     playerNameItem:AddChild(playerVoiceIcon)
-	
-	        //MODIFY START
+    
+    	        //MODIFY START
      
     // Player badge item.
     local playerBadge = GUIManager:CreateGraphicItem()
@@ -739,12 +745,10 @@ function GUIScoreboard:CreatePlayerItem()
     local currentColumnX = Client.GetScreenWidth() / 7
     //local currentColumnX = Client.GetScreenWidth() / 6
     //MODIFY END
-       
     
     // Status text item.
     local statusItem = GUIManager:CreateTextItem()
-    statusItem:SetFontName(GUIScoreboard.kFontName)
-    statusItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    statusItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     statusItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     statusItem:SetTextAlignmentX(GUIItem.Align_Min)
     statusItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -756,8 +760,7 @@ function GUIScoreboard:CreatePlayerItem()
     
     // Score text item.
     local scoreItem = GUIManager:CreateTextItem()
-    scoreItem:SetFontName(GUIScoreboard.kFontName)
-    scoreItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    scoreItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     scoreItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     scoreItem:SetTextAlignmentX(GUIItem.Align_Min)
     scoreItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -769,8 +772,7 @@ function GUIScoreboard:CreatePlayerItem()
     
     // Kill text item.
     local killsItem = GUIManager:CreateTextItem()
-    killsItem:SetFontName(GUIScoreboard.kFontName)
-    killsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    killsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     killsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     killsItem:SetTextAlignmentX(GUIItem.Align_Min)
     killsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -782,8 +784,7 @@ function GUIScoreboard:CreatePlayerItem()
     
     // Deaths text item.
     local deathsItem = GUIManager:CreateTextItem()
-    deathsItem:SetFontName(GUIScoreboard.kFontName)
-    deathsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    deathsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     deathsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     deathsItem:SetTextAlignmentX(GUIItem.Align_Min)
     deathsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -793,10 +794,9 @@ function GUIScoreboard:CreatePlayerItem()
     
     currentColumnX = currentColumnX + GUIScoreboard.kTeamColumnSpacingX
     
-			 //MODIFY START
+				 //MODIFY START
     local assistsItem = GUIManager:CreateTextItem()
-    assistsItem:SetFontName(GUIScoreboard.kFontName)
-    assistsItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    assistsItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)    
     assistsItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     assistsItem:SetTextAlignmentX(GUIItem.Align_Min)
     assistsItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -810,8 +810,7 @@ function GUIScoreboard:CreatePlayerItem()
 	
     // Resources text item.
     local resItem = GUIManager:CreateTextItem()
-    resItem:SetFontName(GUIScoreboard.kFontName)
-    resItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    resItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     resItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     resItem:SetTextAlignmentX(GUIItem.Align_Min)
     resItem:SetTextAlignmentY(GUIItem.Align_Min)
@@ -823,19 +822,19 @@ function GUIScoreboard:CreatePlayerItem()
     
     // Ping text item.
     local pingItem = GUIManager:CreateTextItem()
-    pingItem:SetFontName(GUIScoreboard.kFontName)
-    pingItem:SetFontSize(GUIScoreboard.kPlayerStatsFontSize)
+    pingItem:SetFontName(GUIScoreboard.kPlayerStatsFontName)
     pingItem:SetAnchor(GUIItem.Left, GUIItem.Top)
     pingItem:SetTextAlignmentX(GUIItem.Align_Min)
     pingItem:SetTextAlignmentY(GUIItem.Align_Min)
     pingItem:SetPosition(Vector(currentColumnX, 5, 0))
     pingItem:SetColor(Color(1, 1, 1, 1))
     playerItem:AddChild(pingItem)
-	
-          //MODIFY START
-    //return { Background = playerItem, Name = playerNameItem, Voice = playerVoiceIcon, Status = statusItem, Score = scoreItem, Kills = killsItem, Deaths = deathsItem, Resources = resItem, Ping = pingItem }
-    return { Background = playerItem, Name = playerNameItem, Badge = playerBadge, Voice = playerVoiceIcon, Status = statusItem, Score = scoreItem, Kills = killsItem, Assists = assistsItem, Deaths = deathsItem, Resources = resItem, Ping = pingItem }
+    
+    //MODIFY START
+    //return { Background = playerItem, Index = playerIndexItem, Name = playerNameItem, Voice = playerVoiceIcon, Status = statusItem, Score = scoreItem, Kills = killsItem, Deaths = deathsItem, Resources = resItem, Ping = pingItem }
+    return { Background = playerItem, Index = playerIndexItem, Name = playerNameItem, Badge = playerBadge, Voice = playerVoiceIcon, Status = statusItem, Score = scoreItem, Kills = killsItem, Assists = assistsItem, Deaths = deathsItem, Resources = resItem, Ping = pingItem }
     //MODIFY END
+    
 end
 
 local function HandlePlayerVoiceClicked(self)

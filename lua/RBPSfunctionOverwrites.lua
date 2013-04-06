@@ -6,12 +6,13 @@
 //
 // ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
 
-//Default local values, build 221
+//Default local values, build 244
 //NS2Gamerules
 local kGameEndCheckInterval = 0.75
-local kPregameLength = 15
+local kPregameLength = 3
 local kTimeToReadyRoom = 8
 local kPauseToSocializeBeforeMapcycle = 30
+local kGameStartMessageInterval = 10
 			
 //constructMixing
 local kBuildEffectsInterval = 1
@@ -703,24 +704,22 @@ end
         
     end
     //networkmessages.lua    
-    
     function BuildChatMessage(teamOnly, playerName, playerLocationId, playerTeamNumber, playerTeamType, chatMessage)
 
         local message = { }
-        
+
         message.teamOnly = teamOnly
         message.playerName = playerName
         message.locationId = playerLocationId
         message.teamNumber = playerTeamNumber
         message.teamType = playerTeamType
         message.message = chatMessage
-        
-                        //MODIFY START
+
+        //MODIFY START
             RBPS:processChatCommand(playerName,chatMessage)    
         //MODIFY END
-        
         return message
-        
+    
     end   
     
     if RBPSdebug then

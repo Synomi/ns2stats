@@ -71,7 +71,7 @@ function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, pickV
         
         if not newEnt then
             newEnt = CreateEntityForCommander(techId, position, commander)
-			//MODIFY START
+					//MODIFY START
 			if RBPSenabled and Server then
                 RBPS:dropStructure(newEnt, commander)
             end

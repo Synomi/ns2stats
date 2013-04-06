@@ -86,12 +86,12 @@ function OnCommandScores(scoreTable)
     
    //MODIFY START
 	BadgeMixin.currentBadge = scoreTable.badge
-    local badgeTexture = BadgeMixin:GetBadgeIcon()
+    local badgeTexture = BadgeMixin:GetBadgeIcon()   
     Scoreboard_SetPlayerData(scoreTable.clientId, scoreTable.entityId, scoreTable.playerName, scoreTable.teamNumber, scoreTable.score,
                              scoreTable.kills, scoreTable.assists, badgeTexture, scoreTable.deaths, math.floor(scoreTable.resources), scoreTable.isCommander, scoreTable.isRookie,
                              status, scoreTable.isSpectator)
 							 
-							 //MODIFY END
+  //MODIFY END
     
 end
 
