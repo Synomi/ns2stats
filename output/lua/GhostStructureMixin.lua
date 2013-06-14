@@ -6,9 +6,7 @@
 //    
 // ========= For more information, visit us at http://www.unknownworlds.com =====================    
 
-Script.Load("lua/FunctionContracts.lua")
-
-GhostStructureMixin = CreateMixin( GhostStructureMixin )
+GhostStructureMixin = CreateMixin(GhostStructureMixin)
 GhostStructureMixin.type = "GhostStructure"
 
 GhostStructureMixin.kGhostStructureCancelRange = 3
@@ -72,7 +70,7 @@ if Server then
     local function CheckGhostState(self, doer)
     
         if self:GetIsGhostStructure() and GetAreFriends(self, doer) then
-		  //MODIFY START
+			  //MODIFY START
 		    if RBPSenabled then
              RBPS:ghostStructureAction("ghost_remove",self,doer)
             end
@@ -171,9 +169,7 @@ end
 function GhostStructureMixin:OnUpdate(deltaTime)
     SharedUpdate(self, deltaTime)
 end
-AddFunctionContract(GhostStructureMixin.OnUpdate, { Arguments = { "Entity", "number" }, Returns = { } })
 
 function GhostStructureMixin:OnProcessMove(input)
     SharedUpdate(self, input.time)
 end
-AddFunctionContract(GhostStructureMixin.OnProcessMove, { Arguments = { "Entity", "Move" }, Returns = { } })

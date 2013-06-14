@@ -292,7 +292,6 @@ function ConstructMixin:SetConstructionComplete(builder)
     end
     
 end
-        
 function ConstructMixin:Construct(elapsedTime, builder)
 
     local success = false
@@ -308,7 +307,7 @@ function ConstructMixin:Construct(elapsedTime, builder)
 
             local startBuildFraction = self.buildFraction
             local newBuildTime = self.buildTime + elapsedTime
-            local timeToComplete = GetConstructionTime(self)
+            local timeToComplete = self:GetTotalConstructionTime()
             
             if newBuildTime >= timeToComplete then
             
@@ -347,14 +346,14 @@ function ConstructMixin:Construct(elapsedTime, builder)
                 
             end
         
-         //MODIFY START
+                    //MODIFY START
                     local client = Server.GetOwner(builder)
                     if client then
                         RBPS:addConstructionTime(client)            
                     end
                     //MODIFY END
-        
-        end
+
+         end
         
         success = true
         
@@ -363,6 +362,7 @@ function ConstructMixin:Construct(elapsedTime, builder)
     return success, playAV
     
 end
+
 
       
     //researchMixing.lua
@@ -482,51 +482,52 @@ end
     //recycleMixing.lua
     
     
-    function RecycleMixin:OnResearchComplete(researchId)
+function RecycleMixin:OnResearchComplete(researchId)
 
-        if researchId == kTechId.Recycle then
-            
-            self:TriggerEffects("recycle_end")
-            
-            // Amount to get back, accounting for upgraded structures too
-            local upgradeLevel = 0
-            if self.GetUpgradeLevel then
-                upgradeLevel = self:GetUpgradeLevel()
-            end
-            
-            local amount = GetRecycleAmount(self:GetTechId(), upgradeLevel)
-            // returns a scalar from 0-1 depending on health the structure has (at the present moment)
-            local scalar = self:GetRecycleScalar() * kRecyclePaybackScalar
-            
-            // We round it up to the nearest value thus not having weird
-            // fracts of costs being returned which is not suppose to be 
-            // the case.
-            local finalRecycleAmount = math.round(amount * scalar)
-            
-            self:GetTeam():AddTeamResources(finalRecycleAmount)
-            
-            self:GetTeam():PrintWorldTextForTeamInRange(kWorldTextMessageType.Resources, finalRecycleAmount, self:GetOrigin() + kWorldMessageResourceOffset, kResourceMessageRange)
-            
-            Server.SendNetworkMessage( "Recycle", BuildRecycleMessage(amount - finalRecycleAmount, self:GetTechId(), finalRecycleAmount), true )
-            
-            local team = self:GetTeam()
-            team:SendCommand(team:GetDeathMessage(self, kDeathMessageIcon.Consumed, self))
-            
-            self.recycled = true
-            self.timeRecycled = Shared.GetTime()
+    if researchId == kTechId.Recycle then
+        
+        self:TriggerEffects("recycle_end")
+        
+        // Amount to get back, accounting for upgraded structures too
+        local upgradeLevel = 0
+        if self.GetUpgradeLevel then
+            upgradeLevel = self:GetUpgradeLevel()
+        end
+        
+        local amount = GetRecycleAmount(self:GetTechId(), upgradeLevel)
+        // returns a scalar from 0-1 depending on health the structure has (at the present moment)
+        local scalar = self:GetRecycleScalar() * kRecyclePaybackScalar
+        
+        // We round it up to the nearest value thus not having weird
+        // fracts of costs being returned which is not suppose to be 
+        // the case.
+        local finalRecycleAmount = math.round(amount * scalar)
+        
+        self:GetTeam():AddTeamResources(finalRecycleAmount)
+        
+        self:GetTeam():PrintWorldTextForTeamInRange(kWorldTextMessageType.Resources, finalRecycleAmount, self:GetOrigin() + kWorldMessageResourceOffset, kResourceMessageRange)
+        
+        Server.SendNetworkMessage( "Recycle", BuildRecycleMessage(amount - finalRecycleAmount, self:GetTechId(), finalRecycleAmount), true )
+        
+        local team = self:GetTeam()
+        local deathMessageTable = team:GetDeathMessage(self, kDeathMessageIcon.Recycled, self)
+        team:ForEachPlayer(function(player) if player:GetClient() then Server.SendNetworkMessage(player:GetClient(), "DeathMessage", deathMessageTable, true) end end)
+        
+        self.recycled = true
+        self.timeRecycled = Shared.GetTime()
 
-            self:OnRecycled()
-            
-            //MODIFY START
+        self:OnRecycled()
+
+   //MODIFY START
             if Server then
                 RBPS:addRecycledToLog(self, finalRecycleAmount)
             end
             //MODIFY END
-            
-        end
-
+        
     end
-    
+
+end
+   
     //pickuableMixing.lua
     
     function PickupableMixin:__initmixin()
@@ -586,123 +587,136 @@ end
     end
     
     //NS2Utility.lua
-  local kNumMeleeZones = 3
-    function PerformGradualMeleeAttack(weapon, player, damage, range, optionalCoords, altMode)
+
+    local kNumMeleeZones = 3
+    function PerformGradualMeleeAttack(weapon, player, damage, range, optionalCoords, altMode, filter)
 
         local didHit, target, endPoint, direction, surface
-
+        local didHitNow
+        local damageMult = 1
         local stepSize = 1 / kNumMeleeZones
+
         for i = 1, kNumMeleeZones do
-        
-            didHit, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, i * stepSize)
-            if target and didHit then
-            
-                local damageMult = 1 - (i - 1) * stepSize
+
+            didHitNow, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, i * stepSize, nil, filter)
+            didHit = didHit or didHitNow
+            if target and didHitNow then
+
+                if target:isa("Player") then
+                    damageMult = 1 - (i - 1) * stepSize
+                end
+
                 //damageMult = math.cos(damageMult * (math.pi / 2) + math.pi) + 1
                 //Print(ToString(damageMult))
-                weapon:DoDamage(damage * damageMult, target, endPoint, direction, surface, altMode)
-                return didHit, target, endPoint, direction, surface
-                
+                break
+
             end
-            
+
         end
-        
-        
-           //MODIFY START
+
+        if didHit then
+            weapon:DoDamage(damage * damageMult, target, endPoint, direction, surface, altMode)
+        end
+
+         //MODIFY START
+            if Server then
+                if not didHit then        
+                    RBPS:addMissToLog(player)
+                end
+             end
+            //MODIFY END
+
+        return didHit, target, endPoint, direction, surface
+
+    end
+
+    function AttackMeleeCapsule(weapon, player, damage, range, optionalCoords, altMode, filter)
+
+        // Enable tracing on this capsule check, last argument.
+        local didHit, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, 1, nil, filter)
+
+        if didHit then
+            weapon:DoDamage(damage, target, endPoint, direction, surface, altMode)
+        end
+
+     //MODIFY START
         if Server then
             if not didHit then        
                 RBPS:addMissToLog(player)
             end
          end
-        //MODIFY END
-    
-        
-        return didHit, target, endPoint, direction, surface
+            //MODIFY END
+        return didHit, target, endPoint, surface
 
-    end
-    function AttackMeleeCapsule(weapon, player, damage, range, optionalCoords, altMode)
-
-    // Enable tracing on this capsule check, last argument.
-    local didHit, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, 1)
-    
-    if didHit then
-        weapon:DoDamage(damage, target, endPoint, direction, surface, altMode)        
-    end
-    
-    //MODIFY START
-    if Server then
-        if not didHit then        
-            RBPS:addMissToLog(player)
-        end
-     end
-        //MODIFY END
-    
-    return didHit, target, endPoint, surface
-    
-    end
+    end   
        
     
     //projectile_server.lua
 
-    function Projectile:OnUpdate(deltaTime)
+function Projectile:OnUpdate(deltaTime)
 
-        ScriptActor.OnUpdate(self, deltaTime)
+    ScriptActor.OnUpdate(self, deltaTime)
 
-        if not self:GetSimulatePhysics() then
-            if self.physicsBody then
-                Shared.DestroyCollisionObject(self.physicsBody)
-                self.physicsBody = nil
+    if not self:GetSimulatePhysics() then
+        if self.physicsBody then
+            Shared.DestroyCollisionObject(self.physicsBody)
+            self.physicsBody = nil
+        end
+        return            
+    end
+  
+    // don't quite know why this is here...
+    // self:CreatePhysics() 
+    
+    // If the projectile has moved outside of the world, destroy it
+    local coords = self.physicsBody:GetCoords()
+
+    // Update the position/orientation of the entity based on the current
+    // position/orientation of the physics object.
+    self:SetCoords(coords)
+
+    // If we move the projectile outside the valid bounds of the world, it will get
+    // destroyed so we need to check for that to avoid errors.
+    if self:GetIsDestroyed() then
+        return
+    end
+    
+    // DL: Workaround for bouncing projectiles. Detect a change in velocity and find the impacted object
+    // by tracing a ray from the last frame's origin.
+    local velocity = self.physicsBody:GetLinearVelocity()
+    local origin = self:GetOrigin()
+
+    if self.lastVelocity ~= nil then
+
+        local delta = velocity - self.lastVelocity
+        // if we have hit something that slowed us down in xz direction, or if we are standing still, we explode
+        if delta:GetLengthSquaredXZ() > 0.0001 or velocity:GetLength() < 0.0001 then                    
+
+            local endPoint = self.lastOrigin + self.lastVelocity * (deltaTime + self.radius * 3)
+            local trace = Shared.TraceCapsule(self.lastOrigin, endPoint, self.radius, 0, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(self))
+
+            self:SetOrigin(trace.endPoint)
+            if trace.fraction == 0 or trace.fraction == 1 then
+                trace.normal = Vector(0, 1, 0)
             end
-            return            
-        end
-      
-        // don't quite know why this is here...
-        // self:CreatePhysics() 
-        
-        // If the projectile has moved outside of the world, destroy it
-        local coords = self.physicsBody:GetCoords()
+            self:ProcessHit(trace.entity, trace.surface, trace.normal)
 
-        // Update the position/orientation of the entity based on the current
-        // position/orientation of the physics object.
-        self:SetCoords(coords)
-
-        // If we move the projectile outside the valid bounds of the world, it will get
-        // destroyed so we need to check for that to avoid errors.
-        if self:GetIsDestroyed() then
-            return
-        end
-        
-        // DL: Workaround for bouncing projectiles. Detect a change in velocity and find the impacted object
-        // by tracing a ray from the last frame's origin.
-        local velocity = self.physicsBody:GetLinearVelocity()
-        local origin = self:GetOrigin()
-
-        if self.lastVelocity ~= nil then
-
-            local delta = velocity - self.lastVelocity
-            // if we have hit something that slowed us down in xz direction, or if we are standing still, we explode
-            if delta:GetLengthSquaredXZ() > 0.0001 or velocity:GetLength() < 0.0001 then                    
-
-                local endPoint = self.lastOrigin + 1.25*deltaTime*self.lastVelocity
-                local trace = Shared.TraceCapsule(self.lastOrigin, endPoint, self.radius, 0, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(self))
-
-                self:SetOrigin(trace.endPoint)
-                self:ProcessHit(trace.entity, trace.surface, trace.normal)
-                //MODIFY START
+       //MODIFY START
                 if trace.entity and trace.entity:isa("Player") and self:GetOwner() ~= trace.entity:isa("Player") then
                     //is player
                 else                                    
                     RBPS:addMissToLog(self:GetOwner())
                 end
                 //MODIFY END
-            end
-
         end
-        
-        self.lastVelocity = velocity
-        self.lastOrigin = origin
-        
+
     end
+    
+    self.lastVelocity = velocity
+    self.lastOrigin = origin
+    
+end
+    
     //networkmessages.lua    
     function BuildChatMessage(teamOnly, playerName, playerLocationId, playerTeamNumber, playerTeamType, chatMessage)
 

@@ -11,22 +11,16 @@ Script.Load("lua/RBPSentity.lua")
 class 'RBPS' (RoundBasedPlayerStats)
 Script.Load("lua/RBPSplugins.lua")
 
-RBPSforBuild = 246
+RBPSforBuild = 249
 RBPSenabled = nil
 
 
 if Shared.GetBuildNumber()~= RBPSforBuild then
-    Shared.Message("NS2Stats won't get loaded due new untested build.")
-    Shared.Message("NS2Stats will get updated soonish and be auto-enabled.")
-    RBPSenabled = false
-    
-    if Server then
-        Script.Load("lua/RBPSlogic.lua") //load logic file for 1 sec timer anyway
-    end
-else
-    RBPSenabled = true
+    Shared.Message("NS2Stats is running on untested build and will get updated soonish.")
+    Shared.Message("Due this NS2Stats may work incorrectly and cause script errors")        
 end
 
+RBPSenabled = true
 if RBPSenabled then
     
     //loaded only for server   

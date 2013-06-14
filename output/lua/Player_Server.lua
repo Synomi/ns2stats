@@ -34,7 +34,7 @@ function Player:ResetScores()
 
     self.kills = 0
     self.deaths = 0    
-							    //MODIFY START
+								    //MODIFY START
     self.assists = 0
     //MODIFY END 
     self:SetScoreboardChanged(true)
@@ -91,7 +91,6 @@ function Player:SetClientMuted(muteClientIndex, setMuted)
     self.mutedClients[muteClientIndex] = setMuted
     
 end
-AddFunctionContract(Player.SetClientMuted, { Arguments = { "Player", "number", "boolean" }, Returns = { } })
 
 /**
  * Returns true if the passed in client is muted by this Player.
@@ -102,7 +101,6 @@ function Player:GetClientMuted(checkClientIndex)
     return self.mutedClients[checkClientIndex] == true
     
 end
-AddFunctionContract(Player.GetClientMuted, { Arguments = { "Player", "number" }, Returns = { "boolean" } })
 
 // Changes the visual appearance of the player to the special edition version.
 function Player:MakeSpecialEdition()
@@ -392,7 +390,7 @@ function Player:CopyPlayerDataFrom(player)
     self.score = player.score or 0
     self.kills = player.kills
     self.deaths = player.deaths
-					    //MODIFY START
+						    //MODIFY START
     self.assists = player.assists
     //MODIFY END
     
@@ -674,17 +672,18 @@ end
 function Player:GetDeaths()
     return self.deaths
 end
-//MODIFY START
-function Player:GetAssists()   
-    return self.assists
-end
-//MODIFY END
+
 function Player:AddDeaths()
 
     self.deaths = Clamp(self.deaths + 1, 0, kMaxDeaths)
     self:SetScoreboardChanged(true)
     
 end
+//MODIFY START
+function Player:GetAssists()   
+    return self.assists
+end
+//MODIFY END
 
 function Player:GetPing()
 

@@ -85,7 +85,7 @@ function Scoreboard_OnResetGame()
         playerRecord.Score = 0
         playerRecord.Kills = 0
         playerRecord.Deaths = 0
-		        //MODIFY START
+				        //MODIFY START
         playerRecord.Assists = 0
         playerRecord.Badge = nil
         //MODIFY END
@@ -110,7 +110,6 @@ end
 //function Scoreboard_SetPlayerData(clientIndex, entityId, playerName, teamNumber, score, kills, deaths, resources, isCommander, isRookie, status, isSpectator)
 function Scoreboard_SetPlayerData(clientIndex, entityId, playerName, teamNumber, score, kills, assists, badge, deaths, resources, isCommander, isRookie, status, isSpectator)
 //MODIFY END
-
     // Lookup record for player and update it
     for i = 1, table.maxn(playerData) do
     
@@ -124,7 +123,7 @@ function Scoreboard_SetPlayerData(clientIndex, entityId, playerName, teamNumber,
             playerRecord.EntityTeamNumber = teamNumber
             playerRecord.Score = score
             playerRecord.Kills = kills
-			 //MODIFY START
+						 //MODIFY START
             playerRecord.Assists = assists
             playerRecord.Badge = badge
             //MODIFY END
@@ -151,11 +150,11 @@ function Scoreboard_SetPlayerData(clientIndex, entityId, playerName, teamNumber,
     playerRecord.EntityTeamNumber = teamNumber
     playerRecord.Score = score
     playerRecord.Kills = kills
-	 //MODIFY START
+    playerRecord.Deaths = deaths
+		 //MODIFY START
     playerRecord.Assists = assists
     playerRecord.Badge = badge
     //MODIFY END
-    playerRecord.Deaths = deaths
     playerRecord.IsCommander = isCommander
     playerRecord.IsRookie = isRookie
     playerRecord.Resources = 0
@@ -233,6 +232,27 @@ function Scoreboard_GetPlayerRecord(clientIndex)
     end
     
     return nil
+    
+end
+
+function Scoreboard_GetPlayerName(clientIndex)
+
+    local record = Scoreboard_GetPlayerRecord(clientIndex)
+    return record and record.Name
+    
+end
+
+function Scoreboard_GetPlayerList()
+
+    local playerList = { }
+    for p = 1, #playerData do
+    
+        local playerRecord = playerData[p]
+        table.insert(playerList, { name = playerRecord.Name, client_index = playerRecord.ClientIndex })
+        
+    end
+    
+    return playerList
     
 end
 

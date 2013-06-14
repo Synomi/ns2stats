@@ -23,7 +23,7 @@ function RBPS:addLog(tbl)
         return
     end
     
-    tbl.time = Shared.GetSystemTime()
+    tbl.time = Shared.GetGMTString(false)
     tbl.gametime = Shared.GetTime() - RBPS.gamestarted
     RBPSlog = RBPSlog .. json.encode(tbl) .."\n"	
     //local data = RBPSlibc:CompressHuffman(RBPSlog)
@@ -177,7 +177,7 @@ end
 
 
 function RBPS:sendServerStatus(gameState)
-local stime = Shared.GetSystemTime()
+local stime = Shared.GetGMTString(false)
 local gameTime = Shared.GetTime() - RBPS.gamestarted
     local params = 
     {

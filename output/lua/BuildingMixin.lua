@@ -12,7 +12,7 @@ BuildingMixin.type = "Building"
 function BuildingMixin:__initmixin()    
 end
 
-local function EvalBuildIsLegal(self, techId, origin, angle, builderEntity, pickVec)
+local function EvalBuildIsLegal(self, techId, origin, angle, builderEntity, isCommanderPicked)
 
     PROFILE("EvalBuildIsLegal")
 
@@ -21,9 +21,9 @@ local function EvalBuildIsLegal(self, techId, origin, angle, builderEntity, pick
     local attachEntity = nil
     local errorString = nil
     
-    if pickVec == nil then
+    if not isCommanderPicked then
     
-        // When Drifters and MACs build, or untargeted build/buy actions, no pickVec. Trace from order point down to see
+        // When Drifters and MACs build, or untargeted build/buy actions, trace from order point down to see
         // if they're trying to build on top of anything and if that's OK.
         local trace = Shared.TraceRay(Vector(origin.x, origin.y + .1, origin.z), Vector(origin.x, origin.y - .2, origin.z), CollisionRep.Select, PhysicsMask.CommanderBuild, EntityFilterOne(builderEntity))
         legalBuildPosition, position, attachEntity, errorString = GetIsBuildLegal(techId, trace.endPoint, angle, kStructureSnapRadius, self:GetOwner(), builderEntity)
@@ -43,15 +43,15 @@ local function EvalBuildIsLegal(self, techId, origin, angle, builderEntity, pick
 end
 
 // Returns true or false, as well as the entity id of the new structure (or -1 if false)
-// pickVec optional (for AI units). In those cases, builderEntity will be the entity doing the building.
-function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, pickVec, buildTech, builderEntity, trace, owner)
+// If not isCommanderPicked, builderEntity will be the entity doing the building.
+function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, isCommanderPicked, buildTech, builderEntity, trace, owner)
 
     local legalBuildPosition = false
     local position = nil
     local attachEntity = nil
     local coordsMethod = LookupTechData(techId, kTechDataOverrideCoordsMethod, nil)
 
-    legalBuildPosition, position, attachEntity, errorString = EvalBuildIsLegal(self, techId, origin, orientation, builderEntity, pickVec)
+    legalBuildPosition, position, attachEntity, errorString = EvalBuildIsLegal(self, techId, origin, orientation, builderEntity, isCommanderPicked)
     
     if legalBuildPosition then
     
@@ -71,7 +71,7 @@ function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, pickV
         
         if not newEnt then
             newEnt = CreateEntityForCommander(techId, position, commander)
-					//MODIFY START
+										//MODIFY START
 			if RBPSenabled and Server then
                 RBPS:dropStructure(newEnt, commander)
             end
@@ -112,6 +112,8 @@ function BuildingMixin:AttemptToBuild(techId, origin, normal, orientation, pickV
         end
         
     elseif errorString then
+
+        //DebugPrint("AttemptToBuild failed, errorString: %s. Stack: %s", errorString, Script.CallStack())
     
         local commander = self:isa("Commander") and self or self:GetOwner()
     

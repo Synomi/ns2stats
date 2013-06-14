@@ -35,6 +35,7 @@ if Client then
     Script.Load("lua/HelpMixin.lua")
 end
 
+
 //MODIFY START
 Script.Load("lua/RBPS.lua")
 //MODIFY END
@@ -356,9 +357,11 @@ function Player:OnCreate()
     self.darwinMode = false
     self.kills = 0
     self.deaths = 0
-	//MODIFY START
+    
+		//MODIFY START
     self.assists = 0
-    //MODIFY END
+    //MODIFY END  
+	
     self.jumpHandled = false
     self.jumping = false
     self.leftFoot = true
@@ -534,7 +537,6 @@ function Player:AddKill()
     self:SetScoreboardChanged(true)
     
 end
-
 //MODIFY START
 function Player:AddAssist()
 
@@ -1427,7 +1429,7 @@ function Player:OnJumpLand(landIntensity, slowDown)
         self:OnJumpLandLocalClient()
     end
     
-	//MODIFY START
+			//MODIFY START
     if RBPSenabled and Server then
         RBPS:addJump(self:GetName())
     end
@@ -2124,6 +2126,9 @@ function Player:GetIsCloseToGround(distanceToGround)
     // Try to move the controller downward a small amount to determine if
     // we're on the ground.
     local offset = Vector(0, -distanceToGround, 0)
+    
+    //Trace is not yet traceable
+    TraceStopPoint()
     local trace = self.controller:Trace(offset, CollisionRep.Move, CollisionRep.Move, self:GetMovePhysicsMask())
 
     local result = false
@@ -2536,7 +2541,7 @@ function Player:HandleButtons(input)
         // The following inputs are disabled when the player cannot control themself.
         input.commands = bit.band(input.commands, bit.bnot(bit.bor(Move.Use, Move.Buy, Move.Jump,
                                                                    Move.PrimaryAttack, Move.SecondaryAttack,
-                                                                   Move.NextWeapon, Move.PrevWeapon, Move.Reload,
+                                                                   Move.NextWeapon, Move.PrevWeapon, Move.Reload, Move.QuickSwitch,
                                                                    Move.Taunt, Move.Weapon1, Move.Weapon2,
                                                                    Move.Weapon3, Move.Weapon4, Move.Weapon5, Move.Crouch)))
                                                                    
@@ -2617,6 +2622,10 @@ function Player:HandleButtons(input)
         
         if bit.band(input.commands, Move.Weapon5) ~= 0 then
             self:SwitchWeapon(5)
+        end
+        
+        if bit.band(input.commands, Move.QuickSwitch) ~= 0 then
+            self:QuickSwitchWeapon()
         end
         
     end

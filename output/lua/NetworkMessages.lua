@@ -18,6 +18,7 @@ Script.Load("lua/SharedDecal.lua")
 Script.Load("lua/BadgeMixin.lua") 
 //MODIFY END
 
+
 local kSelectUnitMessage =
 {
     teamNumber = "integer (0 to 4)",
@@ -297,7 +298,7 @@ end
 
 Shared.RegisterNetworkMessage( "Ping", kPingMessage )
 
-kWorldTextMessageType = enum({ 'Resources', 'Resource', 'Damage' })
+kWorldTextMessageType = enum({ 'Resources', 'Resource', 'Damage', 'CommanderError' })
 local kWorldTextMessage =
 {
     messageType = "enum kWorldTextMessageType",
@@ -348,7 +349,7 @@ local kScoresMessage =
     score = string.format("integer (0 to %d)", kMaxScore),
     kills = string.format("integer (0 to %d)", kMaxKills),
     deaths = string.format("integer (0 to %d)", kMaxDeaths),
-								    //MODIFY START
+										    //MODIFY START
     assists = string.format("integer (0 to %d)", kMaxScore),
     badge = "enum kBadges",
     //MODIFY END
@@ -375,7 +376,7 @@ function BuildScoresMessage(scorePlayer, sendToPlayer)
     end
     t.kills = scorePlayer:GetKills()
     t.deaths = scorePlayer:GetDeaths()
-		//MODIFY START    
+				//MODIFY START    
     t.assists = scorePlayer:GetAssists()    
     t.badge = scorePlayer.currentBadge or kBadges.None
     //MODIFY END
@@ -819,16 +820,18 @@ local kSetNameMessage =
 }
 Shared.RegisterNetworkMessage("SetName", kSetNameMessage)
 
+-- Adding 1 to kMaxChatLength here to account for the zero terminated string.
 local kChatClientMessage =
 {
     teamOnly = "boolean",
-    message = string.format("string (%d)", kMaxChatLength)
+    message = string.format("string (%d)", kMaxChatLength + 1)
 }
 
 function BuildChatClientMessage(teamOnly, chatMessage)
     return { teamOnly = teamOnly, message = chatMessage }
 end
 
+-- Adding 1 to kMaxChatLength here to account for the zero terminated string.
 local kChatMessage =
 {
     teamOnly = "boolean",
@@ -836,7 +839,7 @@ local kChatMessage =
     locationId = "integer (-1 to 1000)",
     teamNumber = "integer (" .. kTeamInvalid .. " to " .. kSpectatorIndex .. ")",
     teamType = "integer (" .. kNeutralTeamType .. " to " .. kAlienTeamType .. ")",
-    message = string.format("string (%d)", kMaxChatLength)
+    message = string.format("string (%d)", kMaxChatLength + 1)
 }
 
 function BuildChatMessage(teamOnly, playerName, playerLocationId, playerTeamNumber, playerTeamType, chatMessage)

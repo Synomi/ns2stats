@@ -78,14 +78,13 @@ local RBPShit = false
                 // Many types of damage events are server-only, such as grenades.
                 // Send the player a message so they get feedback about what damage they've done.
                 // We use messages to handle multiple-hits per frame, such as splash damage from grenades.
-                if Server and attacker:isa("Player") and (not doer.GetShowHitIndicator or doer:GetShowHitIndicator()) then
-								//MODIFY START
+                if Server and attacker:isa("Player") then
+                							//MODIFY START
 				    if RBPSenabled then
                         RBPShit = true                     
                         RBPS:addHitToLog(target, attacker, doer, damage, damageType)
                     end
                     //MODIFY END
-				
                     local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive()
                     if showNumbers then
                     
@@ -103,7 +102,10 @@ local RBPShit = false
                     end
                     
                     // This makes the cross hair turn red. Show it when hitting anything
-                    attacker.giveDamageTime = Shared.GetTime()
+                    if not doer.GetShowHitIndicator or doer:GetShowHitIndicator() then
+                        attacker.giveDamageTime = Shared.GetTime()
+                    end
+                    
                 end
                 
                 killedFromDamage = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)
@@ -119,15 +121,15 @@ local RBPShit = false
             end
 
         end
-        
-				//MODIFY START
+		
+					//MODIFY START
             if RBPSenabled and not RBPShit then
                 if Server then
                     RBPS:addMissToLog(attacker)                
                 end
             end
             //MODIFY END
-		
+        
         // trigger damage effects (damage, deflect) with correct surface
         if surface ~= "none" then
         
