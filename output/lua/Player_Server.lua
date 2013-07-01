@@ -28,13 +28,25 @@ function Player:Reset()
     
     self:SetCameraDistance(0)
     
+    self.timeUntilResourceBlock = 0
+    self.blockPersonalResources = false
+    
+    local client = Server.GetOwner(self)
+    
+    if client then
+    
+        client.timeUntilResourceBlock = 0
+        client.blockPersonalResources = false
+    
+    end
+    
 end
 
 function Player:ResetScores()
 
     self.kills = 0
     self.deaths = 0    
-								    //MODIFY START
+									    //MODIFY START
     self.assists = 0
     //MODIFY END 
     self:SetScoreboardChanged(true)
@@ -162,6 +174,12 @@ end
  * may be nil if the damage wasn't directional.
  */
 function Player:OnKill(killer, doer, point, direction)
+
+    if not Shared.GetCheatsEnabled() then
+        if (killer == nil and doer == nil) or killer:isa("DeathTrigger") or doer:isa("DeathTrigger") then
+            self.spawnBlockTime = Shared.GetTime() + kSuicideDelay + kFadeToBlackTime
+        end
+    end
 
     // Determine the killer's player name.
     local killerName = nil
@@ -355,6 +373,8 @@ function Player:CopyPlayerDataFrom(player)
     // This is stuff from the former LiveScriptActor.
     self.gameEffectsFlags = player.gameEffectsFlags
     self.timeOfLastDamage = player.timeOfLastDamage
+    self.spawnBlockTime = player.spawnBlockTime
+    self.spawnReductionTime = player.spawnReductionTime
     
     // ScriptActor and Actor fields
     self:SetAngles(player:GetAngles())
@@ -372,9 +392,6 @@ function Player:CopyPlayerDataFrom(player)
     // This is a hack, CameraHolderMixin should be doing this.
     self.baseYaw = player.baseYaw
     
-    // MoveMixin fields.
-    self:SetGravityEnabled(player:GetGravityEnabled())
-    
     self.name = player.name
     self.clientIndex = player.clientIndex
     self.client = player.client
@@ -390,9 +407,10 @@ function Player:CopyPlayerDataFrom(player)
     self.score = player.score or 0
     self.kills = player.kills
     self.deaths = player.deaths
-						    //MODIFY START
+							    //MODIFY START
     self.assists = player.assists
     //MODIFY END
+    
     
     self.timeOfDeath = player.timeOfDeath
     self.timeOfLastUse = player.timeOfLastUse

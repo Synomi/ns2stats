@@ -70,7 +70,7 @@ if Server then
     local function CheckGhostState(self, doer)
     
         if self:GetIsGhostStructure() and GetAreFriends(self, doer) then
-			  //MODIFY START
+					  //MODIFY START
 		    if RBPSenabled then
              RBPS:ghostStructureAction("ghost_remove",self,doer)
             end
@@ -114,6 +114,7 @@ local function SharedUpdate(self, deltaTime)
     
         // check for enemies in range and destroy the structure, return resources to team
         local enemies = GetEntitiesForTeamWithinRange("Player", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin() + Vector(0, 0.3, 0), GhostStructureMixin.kGhostStructureCancelRange)
+        table.copy(GetEntitiesForTeamWithinRange("Drifter", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin() + Vector(0, 0.3, 0), GhostStructureMixin.kGhostStructureCancelRange), enemies, true)
         
         for _, enemy in ipairs (enemies) do
         

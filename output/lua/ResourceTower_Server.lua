@@ -10,6 +10,17 @@
 
 function ResourceTower:CollectResources()
 
+    for _, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
+        if not player:isa("Commander") then
+            player:AddResources(kPlayerResPerInterval)
+        end
+    end
+    
+    local team = self:GetTeam()
+    if team then
+        team:AddTeamResources(kTeamResourcePerTick)
+    end
+
     if self:isa("Extractor") then
        self:TriggerEffects("extractor_collect")
     else
@@ -18,20 +29,30 @@ function ResourceTower:CollectResources()
     
     local attached = self:GetAttached()
     
-    
-         //MODIFY START   
+	         //MODIFY START   
          if RBPSenabled then
             RBPS:addResourcesGathered(self)                 
          end
          //MODIFY END
-    
+	
     if attached and attached.CollectResources then
     
         // reduces the resource count of the node
-		
-		
-		
         attached:CollectResources()
+    
+    end
+
+end
+
+function ResourceTower:OnResearchComplete(researchId)
+
+    if researchId == kTechId.TransformResources then
+    
+        for _, player in ipairs(GetEntitiesForTeam("Player", self:GetTeamNumber())) do
+            if not player:isa("Commander") then
+                player:AddResources(kTransformResourcesRate)
+            end
+        end
     
     end
 
@@ -47,5 +68,28 @@ function ResourceTower:OnSighted(sighted)
 end
 
 function ResourceTower:GetIsCollecting()
-    return GetIsUnitActive(self)
+    return GetIsUnitActive(self) and GetGamerules():GetGameStarted()
+end
+
+function ResourceTower:OnUpdate(deltaTime)
+
+    ScriptActor.OnUpdate(self, deltaTime)
+
+    if self:GetIsCollecting() then
+
+        if not self.timeLastCollected then
+            self.timeLastCollected = Shared.GetTime()
+        end
+
+        if self.timeLastCollected + kResourceTowerResourceInterval < Shared.GetTime() then
+        
+            self:CollectResources()
+            self.timeLastCollected = Shared.GetTime()
+            
+        end
+        
+    else
+        self.timeLastCollected = nil
+    end
+
 end

@@ -32,6 +32,9 @@ kTeamColors[kMinimapBlipTeam.Marine] = Color(0, 216/255, 1, 1)
 local kPowerNodeColor = Color(1, 1, 0.7, 1)
 local kDestroyedPowerNodeColor = Color(1, 0, 0, 1)
 
+local kDrifterColor = Color(1, 1, 0, 1)
+local kMACColor = Color(0, 1, 0.2, 1)
+
 local kBlinkInterval = 1
 
 local kScanColor = Color(0.2, 0.8, 1, 1)
@@ -87,8 +90,8 @@ local kLocationFontName = "fonts/AgencyFB_smaller_bordered.fnt"
 
 local kPlayerIconSize = Vector(kBlipSize, kBlipSize, 0)
 
-local kBlipColorType = enum( { 'Team', 'Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan' } )
-local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg' } )
+local kBlipColorType = enum( { 'Team', 'Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC' } )
+local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg', 'Worker' } )
 
 local kBlipInfo = {}
 kBlipInfo[kMinimapBlipType.TechPoint] = { kBlipColorType.Team, kBlipSizeType.TechPoint, kBackgroundBlipsLayer }
@@ -104,6 +107,8 @@ kBlipInfo[kMinimapBlipType.InfestationDying] = { kBlipColorType.InfestationDying
 kBlipInfo[kMinimapBlipType.MoveOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.AttackOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.BuildOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.Drifter] = { kBlipColorType.Drifter, kBlipSizeType.Worker, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.MAC] = { kBlipColorType.MAC, kBlipSizeType.Worker, kStaticBlipsLayer }
 
 local kClassToGrid = BuildClassToGrid()
 
@@ -165,6 +170,8 @@ function GUIMinimap:Initialize()
         colorTable[kBlipColorType.PowerPoint] = kPowerNodeColor
         colorTable[kBlipColorType.DestroyedPowerPoint] = kDestroyedPowerNodeColor
         colorTable[kBlipColorType.Scan] = self.scanColor
+        colorTable[kBlipColorType.Drifter] = kDrifterColor
+        colorTable[kBlipColorType.MAC] = kMACColor
         blipColorTable[blipTeam] = colorTable
     end
     self.blipColorTable = blipColorTable
@@ -983,6 +990,7 @@ function GUIMinimap:SetBlipScale(blipScale)
         blipSizeTable[kBlipSizeType.TechPoint] = blipSize * blipScale
         blipSizeTable[kBlipSizeType.Infestation] = blipSize * (2 * blipScale)
         blipSizeTable[kBlipSizeType.Egg] = blipSize * (0.7 * 0.5 * blipScale)
+        blipSizeTable[kBlipSizeType.Worker] = blipSize * (blipScale)
     end
     
 end
