@@ -198,47 +198,9 @@ function RBPS:doFunctionOverwrites()
     
     end    
     
-    //fireMixing.lua        
-    function FireMixin:SetOnFire(attacker, doer)
-
-        if Server then
-        
-            if not self:GetCanBeSetOnFire() then
-                return
-            end
-            
-            self:SetGameEffectMask(kGameEffect.OnFire, true)
-            
-            if attacker then
-                self.fireAttackerId = attacker:GetId()
-            end
-            
-            if doer then
-                self.fireDoerId = doer:GetId()
-            end
-            
-            if self.timeLastStackAdded == 0 or Shared.GetTime() - self.timeLastStackAdded > kFlamethrowerStackRate then
-            
-                self.timeLastStackAdded = Shared.GetTime()
-                if self.numStacks < kFlamethrowerMaxStacks then
-                    self.numStacks = self.numStacks + 1;
-                end
-                
-            end
-            
-            self.timeBurnInit = Shared.GetTime()
-            self.isOnFire = true
-            
-            //MODIFY START
-            //TODO damage is not correct propably and damagetype
-            RBPS:addHitToLog(self, attacker, doer, self.numStacks*kBurnDamagePerStackPerSecond, 3)
-            //MODIFY END
-            
-            
-            
-        end
-        
-    end
+    //fireMixing.lua  
+ //TODO flamethrower damage is not registered, due change in firemixing   
+  
     
     //ConstructMixing.lua
     local function AddBuildHealth(self, scalar)
