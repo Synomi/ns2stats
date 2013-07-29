@@ -46,7 +46,7 @@ function Player:ResetScores()
 
     self.kills = 0
     self.deaths = 0    
-									    //MODIFY START
+										    //MODIFY START
     self.assists = 0
     //MODIFY END 
     self:SetScoreboardChanged(true)
@@ -409,9 +409,7 @@ function Player:CopyPlayerDataFrom(player)
     self.deaths = player.deaths
 							    //MODIFY START
     self.assists = player.assists
-    //MODIFY END
-    
-    
+    //MODIFY END    
     self.timeOfDeath = player.timeOfDeath
     self.timeOfLastUse = player.timeOfLastUse
     self.crouching = player.crouching
@@ -697,6 +695,7 @@ function Player:AddDeaths()
     self:SetScoreboardChanged(true)
     
 end
+
 //MODIFY START
 function Player:GetAssists()   
     return self.assists
@@ -831,5 +830,13 @@ function Player:OnClientUpdated(client)
         end
     
     end
+
+end
+
+// only use intensity value here to reduce traffic
+function Player:SetCameraShake(intensity)
+
+    local message = BuildCameraShakeMessage(intensity)
+    Server.SendNetworkMessage(self, "CameraShake", message, false)
 
 end
