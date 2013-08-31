@@ -17,7 +17,7 @@ Script.Load("lua/PhysicsGroups.lua")
 Script.Load("lua/Mixins/ModelMixin.lua")
 Script.Load("lua/WeaponOwnerMixin.lua")
 Script.Load("lua/DoorMixin.lua")
-Script.Load("lua/mixins/ControllerMixin.lua")
+Script.Load("lua/Mixins/ControllerMixin.lua")
 Script.Load("lua/LiveMixin.lua")
 Script.Load("lua/UpgradableMixin.lua")
 Script.Load("lua/PointGiverMixin.lua")
@@ -35,10 +35,6 @@ if Client then
     Script.Load("lua/HelpMixin.lua")
 end
 
-//MODIFY START
-Script.Load("lua/RBPS.lua")
-//MODIFY END
-
 --@Abstract
 class 'Player' (ScriptActor)
 
@@ -46,6 +42,7 @@ Player.kTooltipSound = PrecacheAsset("sound/NS2.fev/common/tooltip")
 Player.kToolTipInterval = 18
 Player.kHintInterval = 18
 Player.kPushDuration = 0.5
+Player.kAllFreeCheat = false
 
 if Server then
     Script.Load("lua/Player_Server.lua")
@@ -149,8 +146,6 @@ Player.kMinimumPlayerVelocity = .05    // Minimum player velocity for network pe
 
 // Player speeds
 Player.kWalkMaxSpeed = 5                // Four miles an hour = 6,437 meters/hour = 1.8 meters/second (increase for FPS tastes)
-Player.kMaxWalkableNormal =  math.cos( math.rad(45) )
-Player.kDownSlopeFactor = math.tan( math.rad(60) ) // Stick to ground on down slopes up to 60 degrees
 
 Player.kAcceleration = 40
 Player.kRunAcceleration = 100
@@ -346,12 +341,6 @@ function Player:OnCreate()
     
     self.timeLastMenu = 0
     self.darwinMode = false
-    self.kills = 0
-    self.deaths = 0
-	
-			//MODIFY START
-    self.assists = 0
-    //MODIFY END  
     
     self.leftFoot = true
     self.mode = kPlayerMode.Default
@@ -420,7 +409,7 @@ function Player:OnInitialized()
 
         InitViewModel(self)
         // Only give weapons when playing.
-        if self:GetTeamNumber() ~= kNeutralTeamType then
+        if self:GetTeamNumber() ~= kNeutralTeamType and not self.preventWeapons then
             self:InitWeapons()
         end
         
@@ -489,10 +478,6 @@ function Player:OnDestroy()
         
         self:CloseMenu()
         
-        if self.idleSoundInstance then
-            Client.DestroySoundEffect(self.idleSoundInstance)
-        end
-        
         if self.guiCountDownDisplay then
         
             GetGUIManager():DestroyGUIScript(self.guiCountDownDisplay)
@@ -514,20 +499,6 @@ function Player:OnDestroy()
     end
     
 end
-function Player:AddKill()
-
-    self.kills = Clamp(self.kills + 1, 0, kMaxKills)
-    self:SetScoreboardChanged(true)
-    
-end
-
-//MODIFY START
-function Player:AddAssist()
-
-    self.assists = Clamp(self.assists + 1, 0, kMaxScore)
-    self:SetScoreboardChanged(true)        
-end
-//MODIFY END
 
 function Player:OnEntityChange(oldEntityId, newEntityId)
 
@@ -857,7 +828,7 @@ function Player:PerformUseTrace()
     
 end
 
-function Player:UseTarget(entity, attachPoint, timePassed)
+function Player:UseTarget(entity, timePassed)
 
     assert(entity)
     
@@ -911,7 +882,7 @@ local function AttemptToUse(self, timePassed)
         end
         
         // Use it.
-        if self:UseTarget(entity, attachPoint, kUseInterval) then
+        if self:UseTarget(entity, kUseInterval) then
         
             self:SetIsUsing(true)
             self.timeOfLastUse = Shared.GetTime()
@@ -988,7 +959,13 @@ end
 
 // Individual resources
 function Player:GetResources()
-    return self.resources
+
+    if Shared.GetCheatsEnabled() and Player.kAllFreeCheat then
+        return 100
+    else
+        return self.resources
+    end
+
 end
 
 // Returns player mass in kg
@@ -1000,7 +977,7 @@ function Player:AddResources(amount)
 
     local resReward = 0
 
-    if not self.blockPersonalResources then
+    if Shared.GetCheatsEnabled() or ( amount <= 0 or not self.blockPersonalResources ) then
 
         resReward = math.min(amount, kMaxPersonalResources - self:GetResources())
         local oldRes = self.resources
@@ -1032,7 +1009,11 @@ end
 
 function Player:GetPersonalResources()
 
-    return self.resources
+    if Shared.GetCheatsEnabled() and Player.kAllFreeCheat then
+        return 100
+    else
+        return self.resources
+    end
     
 end
 
@@ -1316,17 +1297,7 @@ function Player:UpdateViewAngles(input)
     
     self:AdjustAngles(input.time)
     
-end
-
-function Player:CheckSlowDown(impactSpeed)
-
-    if self:GetSlowOnLand() then
-    
-        
-    
-    end
-    
-end    
+end   
 
 function Player:GetTriggerLandEffect()
     return not HasMixin(self, "CrouchMove") or not self:GetCrouching()
@@ -1344,6 +1315,10 @@ function Player:OnGroundChanged(onGround, impactForce, normal, velocity)
     if normal and normal.y > 0.5 and self:GetSlowOnLand() then    
     
         local slowdownScalar = Clamp(math.max(0, impactForce - 4) / 18, 0, 1)
+        if self.ModifyJumpLandSlowDown then
+            slowdownScalar = self:ModifyJumpLandSlowDown(slowdownScalar)
+        end
+        
         self:AddSlowScalar(slowdownScalar)
         velocity:Scale(1 - slowdownScalar)  
         
@@ -1353,7 +1328,7 @@ end
 
 function Player:OnJump()
     self:TriggerEffects("jump", {surface = self:GetMaterialBelowPlayer()})
-				//MODIFY START
+					//MODIFY START
     if RBPSenabled and Server then	
         RBPS:addJump(self:GetName())
     end
@@ -1695,7 +1670,9 @@ function Player:SetOrigin(origin)
 end
 
 function Player:GetPlayFootsteps()
-    return self:GetVelocityLength() > .75 and self:GetIsOnGround() and self:GetIsAlive() and ( not HasMixin(self, "CrouchMove") or not self:GetCrouching() )
+    return self:GetVelocityLength() > .75 and self:GetIsOnGround() and self:GetIsAlive() and 
+           (not HasMixin(self, "CrouchMove") or not self:GetCrouching()) and 
+           (not HasMixin(self, "Webable") or not self:GetIsWebbed())
 end
 
 // Called by client/server UpdateMisc()
@@ -1723,7 +1700,7 @@ function Player:OnUpdatePoseParameters()
         
             local activeWeapon = self:GetActiveWeapon()
             if activeWeapon and activeWeapon.UpdateViewModelPoseParameters then
-                activeWeapon:UpdateViewModelPoseParameters(viewModel, input)
+                activeWeapon:UpdateViewModelPoseParameters(viewModel)
             end
             
         end
@@ -1772,7 +1749,7 @@ function Player:GetMaxSpeed(possible)
 end
 
 function Player:GetAcceleration()
-    return 10.5 * self:GetSlowSpeedModifier()
+    return 13 * self:GetSlowSpeedModifier()
 end
 
 function Player:GetAirControl()
@@ -1795,6 +1772,10 @@ end
 
 function Player:GetIsIdle()
     return self:GetVelocityLength() < 0.1 and not self.moveButtonPressed
+end
+
+function Player:GetPlayIdleSound()
+    return self:GetIsAlive() and (self:GetVelocityLength() / self:GetMaxSpeed()) > 0.5
 end
 
 local function CheckSpaceAboveForJump(self)
@@ -1893,11 +1874,6 @@ function Player:HandleAttacks(input)
     self.primaryAttackLastFrame = (bit.band(input.commands, Move.PrimaryAttack) ~= 0)
     self.secondaryAttackLastFrame = (bit.band(input.commands, Move.SecondaryAttack) ~= 0)
     
-    // Have idle sound respond
-    if Client and (self.primaryAttackLastFrame or self.secondaryAttackLastFrame) then
-        self:SetIdleSoundInactive()
-    end
-    
 end
 
 function Player:HandleDoubleTap(input)
@@ -1971,7 +1947,7 @@ function Player:GetSecondaryAttackLastFrame()
 end
 
 function Player:GetIsAbleToUse()
-    return true
+    return self:GetIsAlive()
 end
 
 function Player:HandleButtons(input)
@@ -1985,7 +1961,7 @@ function Player:HandleButtons(input)
                                                                    Move.PrimaryAttack, Move.SecondaryAttack,
                                                                    Move.NextWeapon, Move.PrevWeapon, Move.Reload,
                                                                    Move.Taunt, Move.Weapon1, Move.Weapon2,
-                                                                   Move.Weapon3, Move.Weapon4, Move.Weapon5, Move.Crouch)))
+                                                                   Move.Weapon3, Move.Weapon4, Move.Weapon5, Move.Crouch, Move.Drop, Move.MovementModifier)))
                                                                    
         input.move.x = 0
         input.move.y = 0
@@ -2064,6 +2040,21 @@ function Player:HandleButtons(input)
         if bit.band(input.commands, Move.QuickSwitch) ~= 0 then
             self:QuickSwitchWeapon()
         end
+        
+    end
+    
+end
+
+function Player:OnWeldOverride(doer, elapsedTime)
+
+    // macs weld marines by only 50% of the rate
+    local macMod = (HasMixin(self, "Combat") and self:GetIsInCombat()) and 0.1 or 0.5    
+    local weldMod = ( doer ~= nil and doer:isa("MAC") ) and macMod or 1
+
+    if self:GetArmor() < self:GetMaxArmor() then
+    
+        local addArmor = kPlayerArmorWeldRate * elapsedTime * weldMod
+        self:SetArmor(self:GetArmor() + addArmor)
         
     end
     
@@ -2374,18 +2365,6 @@ function Player:TriggerInvalidSound()
     
 end
 
-function Player:SetEthereal(ethereal)
-
-    if Client then
-    
-        if Player.screenEffects.fadeBlink and (not ethereal or not self:GetIsThirdPerson()) and self:GetIsLocalPlayer() then
-            Player.screenEffects.fadeBlink:SetActive(ethereal)
-        end
-        
-    end
-
-end
-
 function Player:GetIsWallWalkingAllowed(entity)
     return false
 end
@@ -2439,6 +2418,26 @@ end
 
 function Player:GetIsRookie()
     return self.isRookie
+end
+
+function Player:ModifyMaxSpeed(maxSpeedTable)
+
+    for i = 0, self:GetNumChildren() - 1 do
+    
+        local child = self:GetChildAtIndex(i)
+        if child.ModifyMaxSpeed then
+            child:ModifyMaxSpeed(maxSpeedTable)
+        end
+    
+    end
+
+end
+
+function Player:TriggerBeaconEffects()
+
+    self.timeLastBeacon = Shared.GetTime()
+    self:TriggerEffects("distress_beacon_spawn")
+
 end
 
 function Player:GetCommunicationStatus()

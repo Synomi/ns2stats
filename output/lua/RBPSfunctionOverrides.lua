@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================
 
 //Default local values, build 244
 //NS2Gamerules
@@ -17,9 +17,6 @@ local kGameStartMessageInterval = 10
 //constructMixing
 local kBuildEffectsInterval = 1
 
-//pickuableMixing
-local kCheckForPickupRate = 0.1
-local kPickupRange = 1
 
 //commanderAbility
 local kDefaultUpdateTime = 0.5
@@ -102,7 +99,8 @@ function RBPS:doFunctionOverwrites()
     end
     
     //private / nonprivate overwrites in ns2gamerules
-       function NS2GR:OnEntityCreate(entity)
+
+    function NS2GR:OnEntityCreate(entity)
 
         self:OnEntityChange(nil, entity:GetId())
 
@@ -111,13 +109,11 @@ function RBPS:doFunctionOverwrites()
             local team = self:GetTeam(entity:GetTeamNumber())
             
             if team then
-            
-                       //MODIFY START
+             //MODIFY START
                     if entity:isa("Egg") then
                         RBPS:addStructureBuiltToLog(entity, nil)
                     end
                     //MODIFY END
-            
                 if entity:isa("Player") then
             
                     if team:AddPlayer(entity) then
@@ -136,7 +132,8 @@ function RBPS:doFunctionOverwrites()
             
         end
         
-    end     
+    end
+      
         function NS2GR:OnEntityKilled(targetEntity, attacker, doer, point, direction)
         
         // Also output to log if we're recording the game for playback in the game visualizer
@@ -154,6 +151,9 @@ function RBPS:doFunctionOverwrites()
 
     end       
     
+//player.lua
+//todo player onjump needs RBPS:addJump for achievement
+
     //ObstacleMixing.lua
     function RemoveAllObstacles()
         for obstacle, v in pairs(gAllObstacles) do
@@ -163,40 +163,7 @@ function RBPS:doFunctionOverwrites()
        RBPS:gameReset()       
        //MODIFY END
     end
-    
-    //GhostStructureMixing.lua
-    
-    function GhostStructureMixin:__initmixin()
-
-        // init the entity in ghost structure mode
-        if Server then
-        //MODIFY START
-        RBPS:ghostStructureAction("ghost_create",self,nil)
-        //MODIFY END
-            self.isGhostStructure = true
-        end
-        
-    end
-    
-    function GhostStructureMixin:PerformAction(techNode, position)
-
-        if techNode.techId == kTechId.Cancel and self:GetIsGhostStructure() then
-        
-            // give back only 75% of resources to avoid abusing the mechanic
-            self:TriggerEffects("ghoststructure_destroy")
-            local cost = math.round(LookupTechData(self:GetTechId(), kTechDataCostKey, 0) * kRecyclePaybackScalar)
-            self:GetTeam():AddTeamResources(cost)
-            self:GetTeam():PrintWorldTextForTeamInRange(kWorldTextMessageType.Resources, cost, self:GetOrigin() + kWorldMessageResourceOffset, kResourceMessageRange)
-            
-            //MODIFY START            
-            RBPS:ghostStructureAction("ghost_destroy",self,nil)            
-            //MODIFY END
-            DestroyEntity(self)
-
-            
-        end
-    
-    end    
+              
     
     //fireMixing.lua  
  //TODO flamethrower damage is not registered, due change in firemixing   
@@ -228,103 +195,133 @@ function RBPS:doFunctionOverwrites()
     end
 
     
-function ConstructMixin:SetConstructionComplete(builder)
+    function ConstructMixin:SetConstructionComplete(builder)
 
-    // Construction cannot resurrect the dead.
-    if self:GetIsAlive() then
-    
-        local wasComplete = self.constructionComplete
-        self.constructionComplete = true
-        
-        AddBuildHealth(self, 1 - self.buildFraction)
-        AddBuildArmor(self, 1 - self.buildFraction)
-        
-        self.buildFraction = 1
-        
-         //MODIFY START
-        if Server then
-            RBPS:addStructureBuiltToLog(self, builder)
-        end
-        //MODIFY END
-        
-        if wasComplete ~= self.constructionComplete then
-            self:OnConstructionComplete(builder)
-        end
-        
-    end
-    
-end
-function ConstructMixin:Construct(elapsedTime, builder)
+        // Construction cannot resurrect the dead.
+        if self:GetIsAlive() then
 
-    local success = false
-    local playAV = false
-    
-    if not self.constructionComplete then
-        
-        if builder and builder.OnConstructTarget then
-            builder:OnConstructTarget(self)
-        end
-        
-        if Server then
+            local wasComplete = self.constructionComplete
+            self.constructionComplete = true
 
-            local startBuildFraction = self.buildFraction
-            local newBuildTime = self.buildTime + elapsedTime
-            local timeToComplete = self:GetTotalConstructionTime()
-            
-            if newBuildTime >= timeToComplete then
-            
-                self:SetConstructionComplete(builder)
-                
-                // Give points for building structures
-                if self:GetIsBuilt() and not self:isa("Hydra") and builder and HasMixin(builder, "Scoring") then                
-                    builder:AddScore(kBuildPointValue)
-                end
-                
-            else
-            
-                if self.buildTime <= self.timeOfNextBuildWeldEffects and newBuildTime >= self.timeOfNextBuildWeldEffects then
-                
-                    playAV = true
-                    self.timeOfNextBuildWeldEffects = newBuildTime + kBuildEffectsInterval
-                    
-                end
-                
-                self.buildTime = newBuildTime
-                self.buildFraction = math.max(math.min((self.buildTime / timeToComplete), 1), 0)
-                
-                local scalar = self.buildFraction - startBuildFraction
-                AddBuildHealth(self, scalar)
-                AddBuildArmor(self, scalar)
-                
-                if self.oldBuildFraction ~= self.buildFraction then
-                
-                    if self.OnConstruct then
-                        self:OnConstruct(builder, self.buildFraction)
-                    end
-                    
-                    self.oldBuildFraction = self.buildFraction
-                    
-                end
-                
+            AddBuildHealth(self, 1 - self.buildFraction)
+            AddBuildArmor(self, 1 - self.buildFraction)
+
+            self.buildFraction = 1
+
+             //MODIFY START
+            if Server then
+                RBPS:addStructureBuiltToLog(self, builder)
             end
-        
-                    //MODIFY START
-                    local client = Server.GetOwner(builder)
-                    if client then
-                        RBPS:addConstructionTime(client)            
-                    end
-                    //MODIFY END
+            //MODIFY END
 
-         end
-        
-        success = true
-        
+            if wasComplete ~= self.constructionComplete then
+                self:OnConstructionComplete(builder)
+            end
+
+        end
+
     end
-    
-    return success, playAV
-    
-end
 
+
+    function ConstructMixin:Construct(elapsedTime, builder)
+
+        local success = false
+        local playAV = false
+
+        if not self.constructionComplete and (not HasMixin(self, "Live") or self:GetIsAlive()) then
+
+            if builder and builder.OnConstructTarget then
+                builder:OnConstructTarget(self)
+            end
+
+            if Server then
+
+                if not self.lastBuildFractionTechUpdate then
+                    self.lastBuildFractionTechUpdate = self.buildFraction
+                end
+
+                local techTree = self:GetTeam():GetTechTree()
+                local techNode = techTree:GetTechNode(self:GetTechId())
+
+                local modifier = (self:GetTeamType() == kMarineTeamType and GetIsPointOnInfestation(self:GetOrigin())) and kInfestationBuildModifier or 1
+                local startBuildFraction = self.buildFraction
+                local newBuildTime = self.buildTime + elapsedTime * modifier
+                local timeToComplete = self:GetTotalConstructionTime()           
+
+                if newBuildTime >= timeToComplete then
+
+                    self:SetConstructionComplete(builder)
+
+                    if techNode then
+                        techNode:SetResearchProgress(1.0)
+                        techTree:SetTechNodeChanged(techNode, "researchProgress = 1.0f")
+                    end    
+
+                else
+
+                    if self.buildTime <= self.timeOfNextBuildWeldEffects and newBuildTime >= self.timeOfNextBuildWeldEffects then
+
+                        playAV = true
+                        self.timeOfNextBuildWeldEffects = newBuildTime + kBuildEffectsInterval
+
+                    end
+
+                    self.timeLastConstruct = Shared.GetTime()
+                    self.underConstruction = true
+
+                    self.buildTime = newBuildTime
+                    self.oldBuildFraction = self.buildFraction
+                    self.buildFraction = math.max(math.min((self.buildTime / timeToComplete), 1), 0)
+
+                    if techNode and (self.buildFraction - self.lastBuildFractionTechUpdate) >= 0.05 then
+
+                        techNode:SetResearchProgress(self.buildFraction)
+                        techTree:SetTechNodeChanged(techNode, string.format("researchProgress = %.2f", self.buildFraction))
+                        self.lastBuildFractionTechUpdate = self.buildFraction
+
+                    end
+
+                    if not self.GetAddConstructHealth or self:GetAddConstructHealth() then
+
+                        local scalar = self.buildFraction - startBuildFraction
+                        AddBuildHealth(self, scalar)
+                        AddBuildArmor(self, scalar)
+
+                    end
+
+                    if self.oldBuildFraction ~= self.buildFraction then
+
+                        if self.OnConstruct then
+                            self:OnConstruct(builder, self.buildFraction, self.oldBuildFraction)
+                        end
+
+                    end
+
+                end
+
+          //MODIFY START
+                        local client = Server.GetOwner(builder)
+                        if client then
+                            RBPS:addConstructionTime(client)            
+                        end
+                        //MODIFY END
+
+            end
+
+            success = true
+
+        end
+
+        if playAV then
+
+            local builderClassName = builder and builder:GetClassName()    
+            self:TriggerEffects("construct", {classname = self:GetClassName(), doer = builderClassName, isalien = GetIsAlienUnit(self)})
+
+        end 
+
+        return success, playAV
+
+    end
 
       
     //researchMixing.lua
@@ -491,22 +488,24 @@ function RecycleMixin:OnResearchComplete(researchId)
 end
    
     //pickuableMixing.lua
-    
+    local kCheckForPickupRate = 0.1
+    local kPickupRange = 1
+
     function PickupableMixin:__initmixin()
 
-        if Server then
-            //MODIFY START
-            RBPS:addPickableItemCreateToLog(self)
-            //MODIFY END
-            if not self.GetCheckForRecipient or self:GetCheckForRecipient() then
-                self:AddTimedCallback(PickupableMixin._CheckForPickup, kCheckForPickupRate)
-            end
-            
-            if not self.GetIsPermanent or not self:GetIsPermanent() then
-                self:AddTimedCallback(PickupableMixin._DestroySelf, kItemStayTime)
-            end
-            
-        end
+    if Server then
+       //MODIFY START
+               RBPS:addPickableItemCreateToLog(self)
+               //MODIFY END
+           if not self.GetCheckForRecipient or self:GetCheckForRecipient() then
+               self:AddTimedCallback(PickupableMixin._CheckForPickup, kCheckForPickupRate)
+           end
+
+           if not self.GetIsPermanent or not self:GetIsPermanent() then
+               self:AddTimedCallback(PickupableMixin._DestroySelf, kItemStayTime)
+           end
+
+       end      
         
     end
 
@@ -514,43 +513,42 @@ end
     function PickupableMixin:_CheckForPickup()
 
         assert(Server)
-        
+
         // Scan for nearby friendly players that need medpacks because we don't have collision detection yet
         local player = self:_GetNearbyRecipient()
 
         if player ~= nil then
-        
+
             self:OnTouch(player)
-            //MODIFY START
-            RBPS:addPickableItemPickedToLog(self, player)
-            //MODIFY END
+       //MODIFY START
+                RBPS:addPickableItemPickedToLog(self, player)
+                //MODIFY END
             DestroyEntity(self)
-            
+
         end
-        
+
         // Continue the callback.
         return true
-        
+    
     end
-    
-    
+   
     function PickupableMixin:_DestroySelf()
 
         assert(Client == nil)
-        
         //MODIFY START
         if Server then
             RBPS:addPickableItemDestroyedToLog(self)
         end
         //MODIFY END
-        
         DestroyEntity(self)
 
     end
+  
     
     //NS2Utility.lua
 
     local kNumMeleeZones = 3
+    local kRangeMult = 0 // 0.15
     function PerformGradualMeleeAttack(weapon, player, damage, range, optionalCoords, altMode, filter)
 
         local didHit, target, endPoint, direction, surface
@@ -560,6 +558,7 @@ end
 
         for i = 1, kNumMeleeZones do
 
+            local attackRange = range * (1 - (i-1) * kRangeMult)
             didHitNow, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, i * stepSize, nil, filter)
             didHit = didHit or didHitNow
             if target and didHitNow then
@@ -568,8 +567,6 @@ end
                     damageMult = 1 - (i - 1) * stepSize
                 end
 
-                //damageMult = math.cos(damageMult * (math.pi / 2) + math.pi) + 1
-                //Print(ToString(damageMult))
                 break
 
             end
@@ -580,38 +577,62 @@ end
             weapon:DoDamage(damage * damageMult, target, endPoint, direction, surface, altMode)
         end
 
-         //MODIFY START
-            if Server then
-                if not didHit then        
-                    RBPS:addMissToLog(player)
-                end
-             end
-            //MODIFY END
-
+                //MODIFY START
+                if Server then
+                    if not didHit then        
+                        RBPS:addMissToLog(player)
+                    end
+                 end
+                //MODIFY END
         return didHit, target, endPoint, direction, surface
+      
 
     end
 
     function AttackMeleeCapsule(weapon, player, damage, range, optionalCoords, altMode, filter)
 
-        // Enable tracing on this capsule check, last argument.
-        local didHit, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, 1, nil, filter)
+        local targets = {}
+        local didHit, target, endPoint, direction, surface
 
-        if didHit then
-            weapon:DoDamage(damage, target, endPoint, direction, surface, altMode)
+        if not filter then
+            filter = EntityFilterTwo(player, weapon)
         end
 
-     //MODIFY START
-        if Server then
-            if not didHit then        
-                RBPS:addMissToLog(player)
-            end
-         end
-            //MODIFY END
-        return didHit, target, endPoint, surface
+        for i = 1, 20 do
 
-    end   
-       
+            local traceFilter = function(test)
+                return EntityFilterList(targets)(test) or filter(test)
+            end
+
+            // Enable tracing on this capsule check, last argument.
+            didHit, target, endPoint, direction, surface = CheckMeleeCapsule(weapon, player, damage, range, optionalCoords, true, 1, nil, traceFilter)
+            local alreadyHitTarget = target ~= nil and table.contains(targets, target)
+
+            if didHit and not alreadyHitTarget then
+                weapon:DoDamage(damage, target, endPoint, direction, surface, altMode)
+            end
+
+       //MODIFY START
+            if Server then
+                if not didHit then        
+                    RBPS:addMissToLog(player)
+                end
+             end
+                //MODIFY END
+
+            if target and not alreadyHitTarget then
+                table.insert(targets, target)
+            end
+
+            if not target or not HasMixin(target, "SoftTarget") then
+                break
+            end
+
+        end
+
+        return didHit, targets[#targets], endPoint, surface
+
+    end           
     
     //projectile_server.lua
 
@@ -680,24 +701,13 @@ function Projectile:OnUpdate(deltaTime)
 end
     
     //networkmessages.lua    
+    oldBuildChatMessage = BuildChatMessage
     function BuildChatMessage(teamOnly, playerName, playerLocationId, playerTeamNumber, playerTeamType, chatMessage)
 
-        local message = { }
+        RBPS:processChatCommand(playerName,chatMessage,teamOnly)    
+        return oldBuildChatMessage(teamOnly, playerName, playerLocationId, playerTeamNumber, playerTeamType, chatMessage)
+    end     
 
-        message.teamOnly = teamOnly
-        message.playerName = playerName
-        message.locationId = playerLocationId
-        message.teamNumber = playerTeamNumber
-        message.teamType = playerTeamType
-        message.message = chatMessage
-
-        //MODIFY START
-            RBPS:processChatCommand(playerName,chatMessage)    
-        //MODIFY END
-        return message
-    
-    end   
-    
     if RBPSdebug then
         Shared.Message("NS2Stats function overwrites done.")    
     end

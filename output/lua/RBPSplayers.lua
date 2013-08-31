@@ -26,56 +26,6 @@ function RBPS:addKill(attacker_steamId,target_steamId)
     end
 end
 
-//assists
-function RBPS:addAssists(attacker_steamId,target_steamId, pointValue)
-    for key,taulu in pairs(RBPS.Players) do
-        if taulu["steamId"] == target_steamId then
-            for k,d in pairs(taulu.damageTaken) do		
-                if d.steamId ~= attacker_steamId then
-                    //add assist
-                    local client = RBPS:getPlayerClientBySteamId(d.steamId)
-                    if client then //player might have disconnected
-                        local player = client:GetControllingPlayer()
-                        
-                        if player then                            
-                            player:AddAssist() //RBPSplayer entity should update 1 second later automatically
-                            player:AddScore(pointValue)
-                        end
-                    end                                                      
-                end
-            end 
-            
-            return       
-        end
-    end
-end
-
-function RBPS:playerAddDamageTaken(attacker_steamId,target_steamId)
-
-	for key,taulu in pairs(RBPS.Players) do		
-		if taulu["steamId"] == target_steamId then
-	        //if steamid already in table then update, else add
-	        for k,d in pairs(taulu.damageTaken) do		
-	            if attacker_steamId == d.steamId then //reset timer	                
-	                d.time = 0
-                    return
-	            end	            
-        	end
-
-            //if we are still here we need to insert steamid into damageTaken
-            table.insert(taulu.damageTaken,
-            {
-                steamId = attacker_steamId,
-                time = 0
-            })             	            
-            return   	
-		end
-    end
-            
-end
-
-
-
 function RBPS:addPlayerToTable(client)
 	
     if not client then return end
@@ -160,6 +110,12 @@ function RBPS:createPlayerTable(client)
         deaths = 0,
         assists =0,
         killstreak =0,
+        totalKills =0,
+        totalDeaths=0,
+        playerSkill=0,
+        totalScore=0,
+        totalPlayTime=0,
+        playerLevel=0,
         highestKillstreak =0,
         jumps = 0,
         walked = 0, //not used        
@@ -412,7 +368,7 @@ function RBPS:UpdatePlayerInTable(client)
     local weapon = "none"
 	
 	for key,taulu in pairs(RBPS.Players) do
-		--Jos taulun(pelaajan) steamid on sama kuin etsittävä niin päivitetään tiedot.
+		--Jos taulun(pelaajan) steamid on sama kuin etsittï¿½vï¿½ niin pï¿½ivitetï¿½ï¿½n tiedot.
 		if (taulu["isbot"] == false and taulu["steamId"] == steamId) or (taulu["isbot"] == true and taulu["name"] == player:GetName()) then
 		    taulu = RBPS:checkTeamChange(taulu,player)
 		    taulu = RBPS:checkLifeformChange(taulu,player)
@@ -435,12 +391,21 @@ function RBPS:UpdatePlayerInTable(client)
 			    taulu["steamId"] = client:GetUserId()
 			end
 			taulu["name"] = player:GetName()
-			taulu["assists"] = player:GetAssists()
+			taulu["assists"] = player:GetAssistKills()
 			if HasMixin(player, "Scoring") then taulu["score"] = player:GetScore() end
 			taulu["ping"] = client:GetPing()
 			taulu["teamnumber"] = player:GetTeamNumber()
 			taulu["isbot"] = client:GetIsVirtual()		
-			taulu["isCommander"] = player:GetIsCommander()
+			taulu["isCommander"] = player:GetIsCommander()                        
+
+                        taulu['totalKills'] = player.totalKills
+                        taulu['totalAssists'] = player.totalAssists
+                        taulu['totalDeaths'] = player.totalDeaths
+                        taulu['playerSkill'] = player.playerSkill
+                        taulu['totalScore'] = player.totalScore
+                        taulu['totalPlayTime'] = player.totalPlayTime
+                        taulu['playerLevel'] = player.playerLevel
+
 			
 			if RBPSconfig.afkKickEnabled and RBPSnumperOfPlayers > RBPSconfig.afkKickPlayersToEnable and RBPS:areSameCoordinates(taulu,origin) then			
 			    taulu["afkCount"] = taulu["afkCount"] + 1

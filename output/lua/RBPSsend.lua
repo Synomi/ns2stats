@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================
 
 function RBPS:initLog ()       
     RBPSlogInit = true
@@ -169,7 +169,7 @@ function RBPS:onHTTPResponseFromSend(client,action,response,status)
             RBPSlastLog = nil
             RBPSsuccessfulSends = RBPSsuccessfulSends +1
         end
-        Shared.Message("NS2Stats.org: (" .. response .. ")")
+        Shared.Message("ns2stats.com: (" .. response .. ")")
 	end
 	
 end

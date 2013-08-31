@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================
 
 local lastServerUpdateSec = 0
 local lastServerUpdate100ms = 0
@@ -227,7 +227,7 @@ function RBPS:resendLogic()
 
     if RBPSlastLog then //means that last send is not completed yet, and we might have to resend
         if (Shared.GetSystemTime() - RBPSsendStartTime) > RBPSresendWaitTime then 
-            //we did not reseice responce from ns2stats.org in time so we will resend last log
+            //we did not reseice responce from ns2stats.com in time so we will resend last log
             RBPS:resendData()                                
         end       
     end

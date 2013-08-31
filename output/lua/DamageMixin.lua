@@ -5,7 +5,9 @@
 //    Created by:   Andreas Urwalek (andi@unknownworlds.com)  
 //    
 // ========= For more information, visit us at http://www.unknownworlds.com =====================    
-
+//MODIFY START
+Script.Load("lua/RBPS.lua")
+//MODIFY END
 DamageMixin = CreateMixin(DamageMixin)
 DamageMixin.type = "Damage"
 
@@ -63,10 +65,11 @@ local RBPShit = false
         
         local armorUsed = 0
         local healthUsed = 0
+        local damageDone = 0
         
         if target and HasMixin(target, "Live") and damage > 0 then  
 
-            damage, armorUsed, healthUsed = GetDamageByType(target, attacker, doer, damage, damageType)
+            damage, armorUsed, healthUsed = GetDamageByType(target, attacker, doer, damage, damageType, point)
 
             // check once the damage
             if damage > 0 then
@@ -74,21 +77,23 @@ local RBPShit = false
                 if not direction then
                     direction = Vector(0, 0, 1)
                 end
+                
+                killedFromDamage, damageDone = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)
                                 
                 // Many types of damage events are server-only, such as grenades.
                 // Send the player a message so they get feedback about what damage they've done.
                 // We use messages to handle multiple-hits per frame, such as splash damage from grenades.
                 if Server and attacker:isa("Player") then
-                							//MODIFY START
+                        							//MODIFY START
 				    if RBPSenabled then
                         RBPShit = true                     
                         RBPS:addHitToLog(target, attacker, doer, damage, damageType)
                     end
                     //MODIFY END
-                    local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive()
+                    local showNumbers = GetAreEnemies(attacker,target) and target:GetIsAlive() and damageDone > 0
                     if showNumbers then
                     
-                        local msg = BuildDamageMessage(target, damage, point)
+                        local msg = BuildDamageMessage(target, damageDone, point)
                         Server.SendNetworkMessage(attacker, "Damage", msg, false)
                         
                         for _, spectator in ientitylist(Shared.GetEntitiesWithClassname("Spectator")) do
@@ -108,8 +113,6 @@ local RBPShit = false
                     
                 end
                 
-                killedFromDamage = target:TakeDamage(damage, attacker, doer, point, direction, armorUsed, healthUsed, damageType)
-                
                 if self.OnDamageDone then
                     self:OnDamageDone(doer, target)
                 end
@@ -121,15 +124,15 @@ local RBPShit = false
             end
 
         end
-		
-					//MODIFY START
+        
+							//MODIFY START
             if RBPSenabled and not RBPShit then
                 if Server then
                     RBPS:addMissToLog(attacker)                
                 end
             end
             //MODIFY END
-        
+		
         // trigger damage effects (damage, deflect) with correct surface
         if surface ~= "none" then
         
@@ -163,7 +166,11 @@ local RBPShit = false
 
                 // define metal_thin, rock, or other
                 if target.GetSurfaceOverride then
-                    surface = target:GetSurfaceOverride()
+                    surface = target:GetSurfaceOverride(damageDone) or surface
+                    
+                    if surface == "none" then
+                        return killedFromDamage
+                    end
                     
                 elseif GetAreEnemies(self, target) then
 
@@ -210,7 +217,12 @@ local RBPShit = false
                         
                     end
                     
-                    table.removevalue(toPlayers, attacker)
+                    -- No need to send to the attacker if this is a child of the attacker.
+                    -- Children such as weapons are simulated on the Client as well so they will
+                    -- already see the hit effect.
+                    if attacker and self:GetParent() == attacker then
+                        table.removevalue(toPlayers, attacker)
+                    end
                     
                     for _, player in ipairs(toPlayers) do
                         Server.SendNetworkMessage(player, "HitEffect", message, false) 
@@ -226,7 +238,7 @@ local RBPShit = false
                 if target then
                 
                     if (point - attacker:GetOrigin()):GetLength() > 5 then
-                        attacker:TriggerEffects("hit_effect_local", tableParams)
+                        attacker:TriggerEffects("hit_effect_local")
                     end
                     
                 end

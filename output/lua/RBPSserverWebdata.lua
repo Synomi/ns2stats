@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi 
 //
-// ========= For more information, visit us at http://ns2stats.org or #ns2stats @ qnet =====================
+// ========= For more information, visit us at http://ns2stats.com or #ns2stats @ qnet =====================
 
 RBPSwebPlayers = {} //table to store fetched player data
 
@@ -69,7 +69,7 @@ function RBPS:onWebdataResponse(action,response,status,steamId)
         //end
         
      //else
-      //  Shared.Message("Unable to receive player data from http://ns2stats.org")    
+      //  Shared.Message("Unable to receive player data from http://ns2stats.com")    
     end       
     
     if status or not message then //timeout or we got no data = player does not exists

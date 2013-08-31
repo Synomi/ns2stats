@@ -18,7 +18,7 @@ GUIMinimap.kBackgroundHeight = GUIMinimap.kBackgroundWidth
 local kBlipSize = GUIScale(30)
 
 local kWaypointColor = Color(1, 1, 1, 1)
-
+local kEtherealGateColor = Color(0.8, 0.6, 1, 1)
 local kOverviewColor = Color(1, 1, 1, 0.85)
 
 // colors are defined in the dds
@@ -90,8 +90,8 @@ local kLocationFontName = "fonts/AgencyFB_smaller_bordered.fnt"
 
 local kPlayerIconSize = Vector(kBlipSize, kBlipSize, 0)
 
-local kBlipColorType = enum( { 'Team', 'Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC' } )
-local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg', 'Worker' } )
+local kBlipColorType = enum( { 'Team', 'Infestation', 'InfestationDying', 'Waypoint', 'PowerPoint', 'DestroyedPowerPoint', 'Scan', 'Drifter', 'MAC', 'EtherealGate', 'HighlightWorld' } )
+local kBlipSizeType = enum( { 'Normal', 'TechPoint', 'Infestation', 'Scan', 'Egg', 'Worker', 'EtherealGate', 'HighlightWorld', 'Waypoint' } )
 
 local kBlipInfo = {}
 kBlipInfo[kMinimapBlipType.TechPoint] = { kBlipColorType.Team, kBlipSizeType.TechPoint, kBackgroundBlipsLayer }
@@ -104,11 +104,13 @@ kBlipInfo[kMinimapBlipType.PowerPoint] = { kBlipColorType.PowerPoint, kBlipSizeT
 kBlipInfo[kMinimapBlipType.DestroyedPowerPoint] = { kBlipColorType.DestroyedPowerPoint, kBlipSizeType.Normal, kStaticBlipsLayer, "PowerPoint" }
 kBlipInfo[kMinimapBlipType.Infestation] = { kBlipColorType.Infestation, kBlipSizeType.Infestation, kInfestationBlipsLayer, "Infestation" }
 kBlipInfo[kMinimapBlipType.InfestationDying] = { kBlipColorType.InfestationDying, kBlipSizeType.Infestation, kInfestationBlipsLayer, "Infestation" }
-kBlipInfo[kMinimapBlipType.MoveOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
-kBlipInfo[kMinimapBlipType.AttackOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
-kBlipInfo[kMinimapBlipType.BuildOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Normal, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.MoveOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Waypoint, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.AttackOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Waypoint, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.BuildOrder] = { kBlipColorType.Waypoint, kBlipSizeType.Waypoint, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.Drifter] = { kBlipColorType.Drifter, kBlipSizeType.Worker, kStaticBlipsLayer }
 kBlipInfo[kMinimapBlipType.MAC] = { kBlipColorType.MAC, kBlipSizeType.Worker, kStaticBlipsLayer }
+kBlipInfo[kMinimapBlipType.EtherealGate] = { kBlipColorType.EtherealGate, kBlipSizeType.EtherealGate, kBackgroundBlipsLayer }
+kBlipInfo[kMinimapBlipType.HighlightWorld] = { kBlipColorType.HighlightWorld, kBlipSizeType.HighlightWorld, kBackgroundBlipsLayer }
 
 local kClassToGrid = BuildClassToGrid()
 
@@ -137,12 +139,16 @@ function GUIMinimap:Initialize()
     self.inuseDynamicBlips = { }
     self.scanColor = Color(kScanColor.r, kScanColor.g, kScanColor.b, kScanColor.a)
     self.scanSize = Vector(0, 0, 0)
+    self.highlightWorldColor = Color(0, 1, 0, 1)
+    self.highlightWorldSize = Vector(0, 0, 0)
+    self.etherealGateColor = Color(kEtherealGateColor.r, kEtherealGateColor.g, kEtherealGateColor.b, kEtherealGateColor.a)
     self.blipSizeTable = { }
     self.minimapConnections = { }
 
     self:SetScale(1) // Compute plot to map transformation
     self:SetBlipScale(1) // Compute blipSizeTable
     self.blipSizeTable[kBlipSizeType.Scan] = self.scanSize
+    self.blipSizeTable[kBlipSizeType.HighlightWorld] = self.highlightWorldSize
     
     // Initialize blip info lookup table
     local blipInfoTable = {}
@@ -170,8 +176,10 @@ function GUIMinimap:Initialize()
         colorTable[kBlipColorType.PowerPoint] = kPowerNodeColor
         colorTable[kBlipColorType.DestroyedPowerPoint] = kDestroyedPowerNodeColor
         colorTable[kBlipColorType.Scan] = self.scanColor
+        colorTable[kBlipColorType.HighlightWorld] = self.highlightWorldColor
         colorTable[kBlipColorType.Drifter] = kDrifterColor
         colorTable[kBlipColorType.MAC] = kMACColor
+        colorTable[kBlipColorType.EtherealGate] = self.etherealGateColor
         blipColorTable[blipTeam] = colorTable
     end
     self.blipColorTable = blipColorTable
@@ -540,6 +548,24 @@ local function UpdateStaticBlips(self, deltaTime)
     self.scanSize.x = blipSize.x * blipScale
     // do not change table reference
     self.scanSize.y = blipSize.y * blipScale
+    
+    local highlightPos, highlightTime = GetHighlightPosition()
+    if highlightTime then
+    
+        local createAnimFraction = 1 - Clamp((Shared.GetTime() - highlightTime) / 1.5, 0, 1)
+        local sizeAnim = (1 + math.sin(Shared.GetTime() * 6)) * 0.25 + 2
+    
+        local blipScale = createAnimFraction * 15 + sizeAnim
+
+        self.highlightWorldSize.x = blipSize.x * blipScale
+        self.highlightWorldSize.y = blipSize.y * blipScale
+        
+        self.highlightWorldColor.a = 0.7 + 0.2 * math.sin(Shared.GetTime() * 5) + createAnimFraction
+    
+    end
+    
+    local etherealGateAnimFraction = 0.25 + (1 + math.sin(Shared.GetTime() * 10)) * 0.5 * 0.75
+    self.etherealGateColor.a = etherealGateAnimFraction
     
     // spectating?
     local spectating = Client.GetLocalPlayer():GetTeamNumber() == kSpectatorIndex
@@ -982,6 +1008,7 @@ end
 function GUIMinimap:SetBlipScale(blipScale)
 
     if blipScale ~= self.blipScale then
+    
         self.blipScale = blipScale
     
         local blipSizeTable = self.blipSizeTable
@@ -991,6 +1018,9 @@ function GUIMinimap:SetBlipScale(blipScale)
         blipSizeTable[kBlipSizeType.Infestation] = blipSize * (2 * blipScale)
         blipSizeTable[kBlipSizeType.Egg] = blipSize * (0.7 * 0.5 * blipScale)
         blipSizeTable[kBlipSizeType.Worker] = blipSize * (blipScale)
+        blipSizeTable[kBlipSizeType.EtherealGate] = blipSize * (1.5 * blipScale)
+        blipSizeTable[kBlipSizeType.Waypoint] = blipSize * (1.5 * blipScale)
+        
     end
     
 end

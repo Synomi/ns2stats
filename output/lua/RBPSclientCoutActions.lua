@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================    
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================    
 
 if Cout.createClientNetworkAction then        
     Cout:createClientNetworkAction("askServerInfo",
@@ -36,7 +36,7 @@ if Cout.createClientNetworkAction then
     
         Cout:createClientNetworkAction("lastRoundNotEnoughPlayers",
         function (message)
-            RBPSlastRound = "http://ns2stats.org"
+            RBPSlastRound = "http://ns2stats.com"
             local col = Color(240/255, 240/255, 240/255 )             
             Cout:addClientTextMessage(Client.GetScreenWidth() * 1/2,Client.GetScreenHeight() * 5/6,"Game did not have enough players for stats to save.",12, col, "lastRoundNotEnoughPlayers")            
             

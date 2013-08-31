@@ -66,8 +66,8 @@ local highestTable = nil
 end
 
 
-function RBPS:processChatCommand(playerName,chatMessage) 
-    Shared.Message(chatMessage)
+function RBPS:processChatCommand(playerName,chatMessage,teamOnly) 
+    //Shared.Message(chatMessage)
     if not Server then return end
         
     local rp = RBPS:getPlayerByName(playerName)
@@ -78,7 +78,22 @@ function RBPS:processChatCommand(playerName,chatMessage)
     
     local player = client:GetControllingPlayer()        
     if not player then return end                   
+
+    local RBPSplayer = RBPS:getPlayerByClient(client)
     
+    if RBPSplayer then        
+        local message = 
+            {
+                    name = RBPSplayer.name,
+                    action = "chat_message",
+                    team = RBPSplayer.teamnumber,
+                    toteam = teamOnly,
+                    steamid = RBPSplayer.steamId,
+                    message = chatMessage
+            }
+
+        RBPS:addLog(message)        
+    end         
 
     if chatMessage == "/stuck" or chatMessage == "/unstuck" then                              
         rp.unstuck = true
@@ -130,7 +145,7 @@ function RBPS:addMissToLog(attacker)
         --    attackerz             = RBPSplayer.z                
         --}
         
-        --//Lisätään data json-muodossa logiin.            
+        --//Lisï¿½tï¿½ï¿½n data json-muodossa logiin.            
         --RBPS:addLog(missLog)
         //gorge fix
         if weapon == "spitspray" then
@@ -200,12 +215,10 @@ function RBPS:addHitToLog(target, attacker, doer, damage, damageType)
             
         }
 
-        //Lisätään data json-muodossa logiin.            
+        //Lisï¿½tï¿½ï¿½n data json-muodossa logiin.            
         RBPS:addLog(hitLog)       
 
-        RBPS:weaponsAddHit(RBPSplayer, doer:GetMapName(), damage) 
-        
-        RBPS:playerAddDamageTaken(RBPSplayer.steamId,RBPStargetPlayer.steamId)
+        RBPS:weaponsAddHit(RBPSplayer, doer:GetMapName(), damage)                 
         
         
     else //target is a structure       
@@ -257,7 +270,7 @@ function RBPS:addDeathToLog(target, attacker, doer)
                 targetWeapon = target:GetActiveWeapon():GetMapName()
         end
 
-        //Jos on quitannu servulta justiin ennen tjsp niin ei ole clienttiä ja erroria pukkaa. (uwelta kopsasin)
+        //Jos on quitannu servulta justiin ennen tjsp niin ei ole clienttiï¿½ ja erroria pukkaa. (uwelta kopsasin)
         if attacker_client and target_client then
             local deathLog = 
             {
@@ -289,12 +302,10 @@ function RBPS:addDeathToLog(target, attacker, doer)
                 target_lifetime       = string.format("%.4f", Shared.GetTime() - target:GetCreationTime())
             }
             
-            //Lisätään data json-muodossa logiin.                
+            //Lisï¿½tï¿½ï¿½n data json-muodossa logiin.                
             RBPS:addLog(deathLog)
             
-            if attacker:GetTeamNumber() ~= target:GetTeamNumber() then               
-                //add assists
-                RBPS:addAssists(attacker_client:GetUserId(),target_client:GetUserId(), string.format("%d", (target:GetPointValue()/2)))
+            if attacker:GetTeamNumber() ~= target:GetTeamNumber() then                               
                 
                 //addkill / display killstreaks
                 RBPS:addKill(attacker_client:GetUserId(),target_client:GetUserId())
@@ -376,7 +387,7 @@ function RBPS:addDeathToLog(target, attacker, doer)
                 target_lifetime       = string.format("%.4f", Shared.GetTime() - target:GetCreationTime())
             }
             
-            //Lisätään data json-muodossa logiin.            
+            //Lisï¿½tï¿½ï¿½n data json-muodossa logiin.            
             RBPS:addLog(deathLog)
     
 	end

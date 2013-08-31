@@ -18,7 +18,7 @@ function ResourceTower:CollectResources()
     
     local team = self:GetTeam()
     if team then
-        team:AddTeamResources(kTeamResourcePerTick)
+        team:AddTeamResources(kTeamResourcePerTick, true)
     end
 
     if self:isa("Extractor") then
@@ -27,14 +27,15 @@ function ResourceTower:CollectResources()
         self:TriggerEffects("harvester_collect")
     end
     
-    local attached = self:GetAttached()
     
+	local attached = self:GetAttached()
+	
 	         //MODIFY START   
          if RBPSenabled then
             RBPS:addResourcesGathered(self)                 
          end
          //MODIFY END
-	
+    
     if attached and attached.CollectResources then
     
         // reduces the resource count of the node

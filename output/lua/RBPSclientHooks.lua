@@ -4,7 +4,7 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================    
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================    
 
 local RBPSlastClientUpdateSec = 0
 

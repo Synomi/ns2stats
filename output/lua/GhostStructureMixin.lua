@@ -30,6 +30,9 @@ function GhostStructureMixin:__initmixin()
 
     // init the entity in ghost structure mode
     if Server then
+ //MODIFY START
+        RBPS:ghostStructureAction("ghost_create",self,nil)
+        //MODIFY END
         self.isGhostStructure = true
     end
     
@@ -59,6 +62,9 @@ function GhostStructureMixin:PerformAction(techNode, position)
         local cost = math.round(LookupTechData(self:GetTechId(), kTechDataCostKey, 0) * kRecyclePaybackScalar)
         self:GetTeam():AddTeamResources(cost)
         self:GetTeam():PrintWorldTextForTeamInRange(kWorldTextMessageType.Resources, cost, self:GetOrigin() + kWorldMessageResourceOffset, kResourceMessageRange)
+        //MODIFY START            
+            RBPS:ghostStructureAction("ghost_destroy",self,nil)            
+            //MODIFY END
         DestroyEntity(self)
         
     end
@@ -70,7 +76,7 @@ if Server then
     local function CheckGhostState(self, doer)
     
         if self:GetIsGhostStructure() and GetAreFriends(self, doer) then
-					  //MODIFY START
+						  //MODIFY START
 		    if RBPSenabled then
              RBPS:ghostStructureAction("ghost_remove",self,doer)
             end
@@ -80,11 +86,10 @@ if Server then
         
     end
     
-    function GhostStructureMixin:OnKill()
+    function GhostStructureMixin:OnTakeDamage()
     
-        if self:GetIsGhostStructure() then
-            self:TriggerEffects("ghoststructure_destroy")
-            DestroyEntity(self)
+        if self:GetIsGhostStructure() and self:GetHealthFraction() < 0.25 then        
+            ClearGhostStructure(self)
         end
     
     end

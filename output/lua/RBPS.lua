@@ -4,14 +4,14 @@
 //
 //    Created by:   Synomi and Zups and UWE
 //
-// ========= For more information, visit us at www.ns2stats.org or #ns2stats @ qnet =====================
+// ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================
 
 //loaded for client and server.    
 Script.Load("lua/RBPSentity.lua")
 class 'RBPS' (RoundBasedPlayerStats)
 Script.Load("lua/RBPSplugins.lua")
 
-RBPSforBuild = 251
+RBPSforBuild = 254
 RBPSenabled = nil
 
 
@@ -53,14 +53,14 @@ if RBPSenabled then
         RBPS.gamestarted = 0 //initial value
         RBPSlogInit = false //initial value
         RBPSlog = nil //initial value
-        RBPSlastLog = nil //last log which was send to ns2stats.org, saved in memory for resending in case send failed
+        RBPSlastLog = nil //last log which was send to ns2stats.com, saved in memory for resending in case send failed
         RBPSlastLogPartNumber = 0 //for resend
         RBPSlastGameFinished = 0 //for resend
         RBPSresendWaitTime = 30 //how long we wait until we resend log file if no response
         RBPSresendCount = 0 //counter for statistics
         RBPSsuccessfulSends = 0 //counter for statistics
         RBPSlogPartNumber = 1 //initial value
-        RBPSpartSize = 160000 //length in characters - how often data is posted to ns2stats.org, max value ~500000    
+        RBPSpartSize = 160000 //length in characters - how often data is posted to ns2stats.com, max value ~500000    
         RBPSgameFinished = 0 //initial value
         RBPS.statsVersion = "0.42" //current version of ns2stats        
         RBPSteam1ready = false //initial value for tournament mode
@@ -87,20 +87,17 @@ if RBPSenabled then
         //auto arrange
         RBPSautoArrangeGameStarted = false //initial value
         
-        RBPS.websiteUrl = "http://ns2stats.org" //this is url which is shown in player private messages, so its for advertising
-        RBPS.websiteDataUrl = "http://ns2stats.org/api/sendlog" //this is url where posted data is send and where it is parsed into database
-        RBPS.websiteStatusUrl = "http://ns2stats.org/api/sendstatus" //this is url where posted data is send on status sends
-        RBPS.websiteApiUrl = "http://ns2stats.org/api"
+        RBPS.websiteUrl = "http://ns2stats.com" //this is url which is shown in player private messages, so its for advertising
+        RBPS.websiteDataUrl = "http://ns2stats.com/api/sendlog" //this is url where posted data is send and where it is parsed into database
+        RBPS.websiteStatusUrl = "http://ns2stats.com/api/sendstatus" //this is url where posted data is send on status sends
+        RBPS.websiteApiUrl = "http://ns2stats.com/api"
         //webdata
         RBPSwebDataFetched = false
-        //dev
-        //RBPS.websiteUrl = "http://q-q.name/rbps_dev"
-        //RBPS.websiteDataUrl = "http://q-q.name/rbps_dev/api/sendlog" 
-               
-        Shared.Message("NS2Stats loaded.")       
+                     
+        Shared.Message("NS2Stats loaded. Check out stats at ns2stats.com")       
                        
     else //if client loads the lua file
-        RBPSlastRound = "http://ns2stats.org"        
+        RBPSlastRound = "http://ns2stats.com"        
         //awards
         RBPSshowingAwards = false //initial value
         RBPSnextAwardId = 0 //initial value 
@@ -111,8 +108,8 @@ if RBPSenabled then
         Script.Load("lua/RBPSclientAwards.lua")    
         Script.Load("lua/RBPSclientAutoArrange.lua")
         Script.Load("lua/RBPSclientConfig.lua")
-        Shared.Message("Server is using NS2stats, you can find your stats at www.ns2stats.org.")                    
-        RBPS.websiteApiUrl = "http://ns2stats.org/api"
+        Shared.Message("Server is using NS2stats, you can find your stats at ns2stats.com.")                    
+        RBPS.websiteApiUrl = "http://ns2stats.com/api"
                 
         //for map data updates        
         local val = math.random(1,50)        
