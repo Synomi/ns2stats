@@ -98,6 +98,10 @@ function RBPSclientConnect(client)
     if client:GetIsVirtual() == false and RBPSwebDataFetched == true then //data has been fetched already, so fetch for single player
         RBPS:webGetSinglePlayerData(client:GetUserId())
     end
+
+    if RBPSconfig.enableChatLogging then
+        RBPS:PlayerSay(client:GetUserId(),"NS2Stats is set to log chat messages.")              
+    end
 end
 
 function RBPSclientDisconnect(client)

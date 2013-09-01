@@ -87,8 +87,8 @@
     RBPSconfig.afkKickPlayersToEnable = 8
     RBPSconfig.enableELOAutoArrange = false
     RBPSconfig.enableStatusUpdates = true
-    
-    
+    RBPSconfig.enableChatLogging = false
+        
     RBPS:WriteDefaultConfigFile(RBPSconfigFileName, RBPSconfig)
     RBPSconfig = RBPS:LoadConfigFile(RBPSconfigFileName)
     
@@ -134,6 +134,11 @@
         RBPSconfig.enableStatusUpdates = true
         newSettingAdded = true
     end           
+
+    if RBPSconfig.enableChatLogging == nil then //b254
+        RBPSconfig.enableChatLogging = false
+        newSettingAdded = true
+    end     
             
     if not RBPSconfig then
         Shared.Message("Error, cannot load ns2stats config file, stats will not work!")            
