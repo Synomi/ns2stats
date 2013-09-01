@@ -67,18 +67,7 @@ end
 
 RBPSlastChatMessage =""
 function RBPS:processChatCommand(playerName,chatMessage,teamOnly) 
-    //do not log duplicates   
-    local team = nil
-    if teamOnly then
-        team = "teamchat"
-    else
-        team = "publichat"
-    end
-
-    if RBPSlastChatMessage == team .. playerName .. chatMessage then return end
-
-    RBPSlastChatMessage = team .. playerName .. chatMessage
-
+   
     //Shared.Message(chatMessage)
     if not Server then return end
         
@@ -92,22 +81,7 @@ function RBPS:processChatCommand(playerName,chatMessage,teamOnly)
     if not player then return end                   
 
     local RBPSplayer = RBPS:getPlayerByClient(client)    
-
-    if RBPSconfig.enableChatLogging and RBPSplayer then        
-
-        local message = 
-            {
-                    name = RBPSplayer.name,
-                    action = "chat_message",
-                    team = RBPSplayer.teamnumber,
-                    toteam = teamOnly,
-                    steamid = RBPSplayer.steamId,
-                    message = chatMessage
-            }
-
-        RBPS:addLog(message)        
-    end         
-
+      
     if chatMessage == "/stuck" or chatMessage == "/unstuck" then                              
         rp.unstuck = true
         rp.unstuckCounter = 0
@@ -123,6 +97,31 @@ function RBPS:processChatCommand(playerName,chatMessage,teamOnly)
         end    
     end
 
+    if RBPSconfig.enableChatLogging and RBPSplayer then        
+
+        //do not log duplicates   
+        local team = nil
+        if teamOnly then
+           team = "teamchat"
+        else
+           team = "publichat"
+        end
+
+        if RBPSlastChatMessage == team .. playerName .. chatMessage then return end
+
+        RBPSlastChatMessage = team .. playerName .. chatMessage
+        local message = 
+            {
+                    name = RBPSplayer.name,
+                    action = "chat_message",
+                    team = RBPSplayer.teamnumber,
+                    toteam = teamOnly,
+                    steamid = RBPSplayer.steamId,
+                    message = chatMessage
+            }
+
+        RBPS:addLog(message)        
+        end      
 end
 
 function RBPS:addMissToLog(attacker)
