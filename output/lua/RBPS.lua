@@ -11,7 +11,7 @@ Script.Load("lua/RBPSentity.lua")
 class 'RBPS' (RoundBasedPlayerStats)
 Script.Load("lua/RBPSplugins.lua")
 
-RBPSforBuild = 254
+RBPSforBuild = 255
 RBPSenabled = nil
 
 

@@ -391,7 +391,9 @@ function RBPS:UpdatePlayerInTable(client)
 			    taulu["steamId"] = client:GetUserId()
 			end
 			taulu["name"] = player:GetName()
-			taulu["assists"] = player:GetAssistKills()
+                        if type(player["GetAssistKills"]) ~= "nil" then                            
+                            taulu["assists"] = player:GetAssistKills()
+                        end
 			if HasMixin(player, "Scoring") then taulu["score"] = player:GetScore() end
 			taulu["ping"] = client:GetPing()
 			taulu["teamnumber"] = player:GetTeamNumber()

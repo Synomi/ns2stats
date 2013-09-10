@@ -1,10 +1,10 @@
 name        = "NS2Stats"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[(SERVER SIDE MOD) 
-
-Make your server stats enabled! 
-
+description = [=[(SERVER SIDE MOD) 
+
+Make your server stats enabled! 
+
 Check out http://ns2stats.com for more info!]=]
 image       = "preview.jpg"
 publish_id = "5fd7a38"
