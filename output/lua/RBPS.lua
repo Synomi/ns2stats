@@ -11,7 +11,7 @@ Script.Load("lua/RBPSentity.lua")
 class 'RBPS' (RoundBasedPlayerStats)
 Script.Load("lua/RBPSplugins.lua")
 
-RBPSforBuild = 255
+RBPSforBuild = 257
 RBPSenabled = nil
 
 
@@ -83,7 +83,8 @@ if RBPSenabled then
         RBPSawards = nil
         RBPSnextAwardId = 0 //initial value    
         RBPStags = {} //initial value
-        
+        RBPSskipLogging = false //initial value
+
         //auto arrange
         RBPSautoArrangeGameStarted = false //initial value
         
@@ -91,6 +92,8 @@ if RBPSenabled then
         RBPS.websiteDataUrl = "http://ns2stats.com/api/sendlog" //this is url where posted data is send and where it is parsed into database
         RBPS.websiteStatusUrl = "http://ns2stats.com/api/sendstatus" //this is url where posted data is send on status sends
         RBPS.websiteApiUrl = "http://ns2stats.com/api"
+        RBPS.websiteIngameUrl = "http://ingame.ns2stats.com"
+        RBPSserverId = 0
         //webdata
         RBPSwebDataFetched = false
                      
@@ -100,7 +103,7 @@ if RBPSenabled then
         RBPSlastRound = "http://ns2stats.com"        
         //awards
         RBPSshowingAwards = false //initial value
-        RBPSnextAwardId = 0 //initial value 
+        RBPSnextAwardId = 0 //initial value         
            
         Script.Load("lua/RBPSclientHooks.lua")
         Script.Load("lua/RBPSclientCoutActions.lua")   

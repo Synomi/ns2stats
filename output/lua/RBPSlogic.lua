@@ -14,7 +14,7 @@ local lastState=""
 local reloadMapTime = 1800
 local reloadMapCounter = 0
 
-local statusTime = 120
+local statusTime = 30
 local statusCounter = 0
 
 local autoArrangeCounter = 0
@@ -111,6 +111,11 @@ function RBPS:oneSecondTimer()
             Shared.Message("Reloading map for possible mod updates...")
             MapCycle_ChangeMap(Shared.GetMapName())
         end                
+    end
+
+    if GetGamerules():GetAutobuild() or Shared.GetCheatsEnabled() then        
+        RBPSskipLogging = true
+        return
     end
        
 end

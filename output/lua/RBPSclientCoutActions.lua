@@ -54,4 +54,16 @@ if Cout.createClientNetworkAction then
             RBPS:clientShowAwards(message)            
         end
     )
+
+ Cout:createClientNetworkAction("extendedScoreboardLink",
+        function (message)            
+            if RBPSclientConfig.browser and RBPSclientConfig.browser == "steam" then
+                Client.ShowWebpage(message.link)
+            else
+                openNS2Stats(message.link, 0.75,0.8)
+            end
+        end
+       )
 end
+
+   

@@ -9,10 +9,14 @@
 function RBPS:initLog ()       
     RBPSlogInit = true
     RBPSlog = ""    
+    //if autobuild or cheats has been on
+    RBPSskipLogging = false
 end
 
 function RBPS:addLog(tbl)
-    
+    //if autobuild or cheats 
+    if RBPSskipLogging == true then return end
+
     if  RBPSlogInit == false then RBPS:initLog() end
     
     if tbl == nil then
@@ -43,7 +47,9 @@ end
 
 
 function RBPS:sendData()
-		
+    //if autobuild or cheats 
+    if RBPSskipLogging == true then return end   
+
     if RBPSconfig.tournamentMode and not RBPSrecordStats then //do not record stats        
         return
     end	

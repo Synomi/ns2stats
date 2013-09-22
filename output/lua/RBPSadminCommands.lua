@@ -45,7 +45,9 @@ local function toggleTournamentMode()
         RBPS:messageAll("Tournament mode is now disabled.")
     end
     
-    RBPSoverwritesDone = false
+RBPS:saveConfig()
+RBPS:messageAll("NS2Stats settings saved, reload map for new settings.")
+    //RBPSoverwritesDone = false causes crash
 end
 CreateServerAdminCommand("Console_sv_tournamentmode", toggleTournamentMode, "<toggle>, Enables or disables tournament mode (NS2Stats).")
 

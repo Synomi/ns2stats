@@ -23,6 +23,10 @@ Event.Hook("Console_tag",RBPStag)
 //votes
 Event.Hook("Console_votemap",RBPSvotemap)
 
+//extendedscoreboard
+Event.Hook("Console_es",RBPSextendedScoreboard)
+Event.Hook("Console_extendedscoreboard",RBPSextendedScoreboard)
+
 //debug hooks
 Event.Hook("Console_listplayers",RBPSlistplayers)
 Event.Hook("Console_clientcommand",RBPSclientCommand)

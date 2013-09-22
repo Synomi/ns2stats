@@ -510,3 +510,27 @@ function RBPSclientCommand(client)
              
 end
 
+function RBPSextendedScoreboard(client)
+    if RBPSserverId == 0 then
+       Shared.SendHTTPRequest(RBPS.websiteApiUrl .. "/server?key=" .. RBPSadvancedConfig.key,"GET",function(response)
+           local Data = json.decode( response )
+           local serverid=""
+           if Data then RBPSserverId = Data.id or 0 end             
+           local url= RBPS.websiteIngameUrl .. "/live/scoreboard/" .. RBPSserverId
+
+           local player = client:GetControllingPlayer()
+           if player then 
+               Cout:SendMessageToClient(player, "extendedScoreboardLink",{link = url})
+           end            
+       end)        
+    else
+        local url= RBPS.websiteIngameUrl .. "/live/scoreboard/" .. RBPSserverId
+
+        local player = client:GetControllingPlayer()
+        if player then 
+          Cout:SendMessageToClient(player, "extendedScoreboardLink",{link = url})
+        end   
+    end
+
+end
+
