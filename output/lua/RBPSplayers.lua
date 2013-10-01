@@ -90,6 +90,10 @@ function RBPS:createPlayerTable(client)
 		lx=0,
 		ly=0,
 		lz=0,
+                wrh=0,                
+                health = 0,
+                armor = 0,
+                pres = 0,
         unstuck = false,
         unstuckCounter = 0,
         lastCoords =0,
@@ -407,7 +411,12 @@ function RBPS:UpdatePlayerInTable(client)
                         taulu['totalScore'] = player.totalScore
                         taulu['totalPlayTime'] = player.totalPlayTime
                         taulu['playerLevel'] = player.playerLevel
-
+                        
+                        //view roration
+                        taulu['wrh'] = player:GetDirectionForMinimap()        
+                        taulu['health'] = player:GetHealth()
+                        taulu['armor'] = player:GetArmor()
+                        taulu['pres'] = player:GetResources()
 			
 			if RBPSconfig.afkKickEnabled and RBPSnumperOfPlayers > RBPSconfig.afkKickPlayersToEnable and RBPS:areSameCoordinates(taulu,origin) then			
 			    taulu["afkCount"] = taulu["afkCount"] + 1

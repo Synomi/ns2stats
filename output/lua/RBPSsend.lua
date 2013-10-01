@@ -11,6 +11,8 @@ function RBPS:initLog ()
     RBPSlog = ""    
     //if autobuild or cheats has been on
     RBPSskipLogging = false
+
+    RBPS:devourInit()
 end
 
 function RBPS:addLog(tbl)
@@ -212,7 +214,6 @@ function RBPS:onHTTPResponseFromSendStatus(client,action,response,status)
         end
     end
 end
-
 
 
 

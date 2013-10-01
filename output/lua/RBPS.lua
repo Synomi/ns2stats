@@ -24,7 +24,7 @@ RBPSenabled = true
 if RBPSenabled then
     
     //loaded only for server   
-    RBPSdebug=false //shows debug information if true 
+    RBPSdebug=true //shows debug information if true 
       
     if Server then
         
@@ -48,6 +48,7 @@ if RBPSenabled then
         Script.Load("lua/RBPSserverAwardHelpers.lua")    
         Script.Load("lua/RBPSserverWebdata.lua")    
         Script.Load("lua/RBPSserverAutoArrange.lua")                                   
+        Script.Load("lua/RBPSdevour.lua")      
 
         RBPSserverInfo = {} //for server ip+port+password        
         RBPS.gamestarted = 0 //initial value
@@ -90,12 +91,13 @@ if RBPSenabled then
         
         RBPS.websiteUrl = "http://ns2stats.com" //this is url which is shown in player private messages, so its for advertising
         RBPS.websiteDataUrl = "http://ns2stats.com/api/sendlog" //this is url where posted data is send and where it is parsed into database
-        RBPS.websiteStatusUrl = "http://ns2stats.com/api/sendstatus" //this is url where posted data is send on status sends
+        RBPS.websiteStatusUrl = "http://dev.ns2stats.com/api/sendstatus" //this is url where posted data is send on status sends
         RBPS.websiteApiUrl = "http://ns2stats.com/api"
         RBPS.websiteIngameUrl = "http://ingame.ns2stats.com"
         RBPSserverId = 0
         //webdata
         RBPSwebDataFetched = false
+      
                      
         Shared.Message("NS2Stats loaded. Check out stats at ns2stats.com")       
                        

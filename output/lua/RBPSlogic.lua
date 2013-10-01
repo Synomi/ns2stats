@@ -7,8 +7,6 @@
 // ========= For more information, visit us at ns2stats.com or #ns2stats @ qnet =====================
 
 local lastServerUpdateSec = 0
-local lastServerUpdate100ms = 0
-local lastServerUpdate10ms = 0
 local lastState=""
 
 local reloadMapTime = 1800
@@ -136,20 +134,8 @@ function RBPSupdateServer()
     if Shared.GetTime() - lastServerUpdateSec > 1 then
         lastServerUpdateSec = Shared.GetTime()
         RBPS:oneSecondTimer()
-    end
-    /*
-    if Shared.GetTime() - lastServerUpdate100ms > 0.1 then
-        lastServerUpdate100ms = Shared.GetTime()
-        //Cout:rotateTest()
-        //Shared.Message("100mstimer?" .. Shared.GetTime())
-    end
-    
-    if Shared.GetTime() - lastServerUpdate10ms > 0.01 then
-        lastServerUpdate10ms = Shared.GetTime()
-       
-        //Shared.Message("10mstimer?" .. Shared.GetTime())
-    end
-    */
+    end     
+
 end
 
 
