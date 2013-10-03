@@ -51,9 +51,7 @@ end
 function RBPS:oneSecondTimer()
     if RBPSenabled then                  
     
-        RBPS:doFunctionOverwrites()
-          
-        RBPS:playerUpdates()   
+        RBPS:doFunctionOverwrites()                  
 
         RBPSnumperOfPlayers = RBPS:getNumberOfConnectedPlayers()      
 

@@ -77,12 +77,8 @@ local function createDevourMovementFrame()
         }        
         table.insert(data, movement)	
     end
-
-    local frameNumber = 'f' .. devourFrame    
-    local tableData =  {
-        [frameNumber] = data
-       }
-    table.insert(devourMovement, tableData)	    
+ 
+    devourMovement[devourFrame] = data    
 end
 
 
@@ -117,14 +113,8 @@ local function createDevourEntityFrame()
         }        
         table.insert(devourPlayers, devourPlayer)	
     end
-    
-    local frameNumber = 'f' .. devourFrame    
-    local tableData =  {
-        [frameNumber] = devourPlayers
-       }
-    
-    table.insert(devourEntity, tableData)	 
-    
+           
+    devourEntity[devourFrame] = devourPlayers        
 end
 
 local function devourTimer()
@@ -133,7 +123,7 @@ local function devourTimer()
     if Shared.GetTime() - lastServerUpdateFrame > 0.250 then
         lastServerUpdateFrame = Shared.GetTime()
         
-        
+        RBPS:playerUpdates()
         createDevourMovementFrame()
 
         if entityTimeCounter == 0 then
